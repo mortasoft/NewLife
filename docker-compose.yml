@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./api
+    ports:
+      - "5001:5001"
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  db:
+    build:
+      context: ./db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

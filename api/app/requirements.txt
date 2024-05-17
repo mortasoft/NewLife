@@ -1,0 +1,5 @@
+Flask
+mysql-connector-python
+apiflask
+pandas
+python-dotenv
