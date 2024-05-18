@@ -2,37 +2,53 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: newlife-frontend
     build:
       context: ./frontend
     ports:
-      - "5000:5000"
+      - "${FRONTEND_PORT}:5000"
     depends_on:
       - api
+    env_file:
+      - .env
+    networks:
+      - newlife-network
 
   api:
+    container_name: newlife-api
     build:
       context: ./api
     ports:
-      - "5001:5001"
+      - "${API_PORT}:5000"
     depends_on:
       - db
     env_file:
       - .env
+    networks:
+      - newlife-network
 
   db:
+    container_name: newlife-db
     build:
       context: ./db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "3360:3306"
     env_file:
       - .env
     volumes:
       - db_data:/var/lib/mysql
+    
+    networks:
+      - newlife-network
 
 volumes:
   db_data:
+
+networks:
+  newlife-network:
+    driver: bridge

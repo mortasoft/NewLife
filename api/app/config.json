@@ -1,0 +1,22 @@
+{
+    "host": "0.0.0.0",
+    "port": "5100",
+    "version" : "v0.1",
+    "url_base" : "/v1",
+    "entorno": "desarrollo",
+    "favicon" : "https://www.cgr.go.cr/imagescgr/imgs/cgr-favicon/cgr-favicon.ico",
+    "descripcion_api" : "API de Mortasoft.xyz para el uso de las aplicaciones implementadas",
+    "tags": [
+        {"name": "Finanzas Personales", "description": "Aplicación para el control de las finanzas personales"},
+        {"name": "LifeApp", "description": "Aplicación para la gestión de tareas"}
+    ],
+    "servers":[
+        {   "name": "Servidor de Desarrollo",
+            "url": "http://localhost:5100"
+        },
+        {
+            "name": "Servidor de Producción",
+            "url": "https://api.mortasoft.xyz"
+        }
+    ]
+}

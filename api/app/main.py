@@ -1,44 +1,42 @@
-from flask import Flask, jsonify
-import mysql.connector
+from flask import redirect
+from apiflask import APIFlask
 import os
+from markupsafe import escape
+import utils as app_utils
 from dotenv import load_dotenv
-from flask_swagger_ui import get_swaggerui_blueprint
-
 load_dotenv()
 
-app = Flask(__name__)
+BASE_DIRECTORY = os.path.dirname(__file__)
+CONFIG = app_utils.read_config_file(BASE_DIRECTORY)
 
-# Configuración de Swagger
-SWAGGER_URL = '/swagger'
-API_URL = '/static/swagger.yml'
-swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
-    config={
-        'app_name': "My API"
-    }
-)
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+# API VERSION 
+version = CONFIG.get("version")
 
-@app.route('/api')
-def api():
-    try:
-        connection = mysql.connector.connect(
-            host='db',
-            user=os.getenv('MYSQL_USER'),
-            password=os.getenv('MYSQL_PASSWORD'),
-            database=os.getenv('MYSQL_DATABASE')
-        )
-        cursor = connection.cursor()
-        cursor.execute("SELECT DATABASE();")
-        db_name = cursor.fetchone()
-        return jsonify({"message": f"Connected to database: {db_name}"})
-    except mysql.connector.Error as err:
-        return jsonify({"error": str(err)})
-    finally:
-        if (connection.is_connected()):
-            cursor.close()
-            connection.close()
+app = APIFlask(__name__, title="Mortasoft.xyz API" , version=version)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001)
+# BASE URL 
+url_base = CONFIG.get("url_base") 
+
+app.config['DOCS_FAVICON'] = CONFIG.get("favicon")
+app.config['JSON_AS_ASCII'] = False
+app.config['JSON_SORT_KEYS'] = False
+
+# openapi.info.description
+app.config['DESCRIPTION'] = CONFIG.get("descripcion_api")
+app.config['SERVERS'] = CONFIG.get("servers")
+
+@app.route("/" )
+@app.doc(hide=True)
+def home():
+    return redirect("/docs", code=302)
+
+
+from lifeapp.endpoints import configure_endpoints; configure_endpoints(app)
+
+
+
+app.run(debug=True,host='0.0.0.0',port=os.getenv('API_PORT'))
+
+
+# https://github.com/apiflask/apiflask/blob/main/examples/basic/app.py
+# https://apiflask.com/en/stable/quickstart/
