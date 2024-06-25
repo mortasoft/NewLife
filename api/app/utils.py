@@ -1,4 +1,4 @@
-import os
+import os,sys
 import json
 import datetime
 from colorama import Fore,Style
@@ -11,21 +11,21 @@ def read_config_file(dir):
     try:
         f = open(dir+"/config.json")
         data = json.load(f)
-        imprimir("Archivo de configuración cargado correctamente")
-        #imprimir(json.dumps(data,indent=4,sort_keys=True))
+        print_with_format("JSON Configuration file loaded successfully.")
         return data
     except Exception as e:
-        print(e)
-        exit()
+        print(f"Error opening configuration file {e}")
+        sys.exit()
 
 
-def imprimir(texto, debug=True):
+def print_with_format(texto, debug=True):
     if debug:
-        date = datetime.datetime.now().strftime("%x %X")
-        salida = f"[{Fore.GREEN}{date}{Style.RESET_ALL}] {texto}"
-        print(salida)
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{Fore.GREEN}{date}{Style.RESET_ALL}] | {texto}")
+        
 
-
-def print_with_format(text):
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    print(f"{timestamp} | {text}")
+def print_with_format_error(texto, debug=True):
+    if debug:
+        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{Fore.RED}{date}{Style.RESET_ALL}] | {texto}")
+        

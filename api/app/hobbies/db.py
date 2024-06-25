@@ -9,8 +9,7 @@ from sqlalchemy import select, asc, desc
 import uuid
 import hashlib
 import os
-from utils import print_with_format
-
+import utils as app_utils
 
 
 def generate_uuid():
@@ -47,16 +46,17 @@ class DB():
 
         Raises:
             Exception: If there is an error connecting to the database.
-        """
-        self.DB_USER = os.getenv("DB_USERNAME")
-        self.DB_PASS = os.getenv("DB_PASSWORD")
-        self.DB_HOST = os.getenv("DB_HOST")
-        self.DB_PORT = os.getenv("DB_PORT")
-        self.DB_NAME = os.getenv("DB_LIFEAPP_NAME")
-        conn_string = f"mysql+pymysql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        engine = create_engine(conn_string, echo=False)
-        
+        """       
         try:
+            
+            self.DB_USER = os.getenv("DB_USERNAME")
+            self.DB_PASS = os.getenv("DB_PASSWORD")
+            self.DB_HOST = os.getenv("DB_HOST")
+            self.DB_PORT = os.getenv("DB_PORT")
+            self.DB_NAME = os.getenv("DB_LIFEAPP_NAME")
+            conn_string = f"mysql+pymysql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+            engine = create_engine(conn_string, echo=False)
+            
             # Create the database if it does not exist.
             if not database_exists(engine.url):
                 create_database(engine.url)
@@ -69,10 +69,9 @@ class DB():
             
             Session = sessionmaker(bind=engine)        
             self.session = Session()
-            print_with_format("Connected to the database")
+            app_utils.print_with_format(f"Connected to the database")
         except Exception as e:
-            print_with_format("Error connecting to the database")
-            raise
+            app_utils.print_with_format(f"Error connecting to the database {e}")
     
     def __str__(self) -> str:
         return f"DB({self.DB_USER}, {self.DB_PASS}, {self.DB_HOST}, {self.DB_PORT}, {self.DB_NAME})"

@@ -1,6 +1,7 @@
-from lifeapp.db import *
-from utils import print_with_format
+import sys,os
+from hobbies.db import *
 from dataclasses import dataclass
+import utils as app_utils
 
 BASE_NAME = "hobbies"
 
@@ -16,7 +17,7 @@ class ActivityLog(Base):
         
     id = Column("id", String(36), primary_key=True, default=generate_uuid)
     date = Column("date", Date())
-    title = Column("title", String(40)) 
+    title = Column("title", String(60)) 
     rating = Column("rating", Integer)
     category = Column("category", String(40))
     
@@ -31,10 +32,12 @@ class ActivityLog(Base):
 
    
 class Hobbies():
-    def __init__(self) -> None:
+    def __init__(self,db) -> None:
         try:
-            self.session = DB().session
+            self.session = db.session
+            app_utils.print_with_format(f"The database session was assigned successfully to the Hobbies class.")
         except Exception as e:
+            app_utils.print_with_format(f"Error creating session in Hobbies class {e}")    
             raise
     
     def add_activity(self, date, title, rating, category):
@@ -52,9 +55,9 @@ class Hobbies():
         try:
             self.session.add(new)
             self.session.commit()
-            print_with_format(f"Activity log {new} created successfully")
+            app_utils.print_with_format(f"Activity log {new} created successfully")
         except Exception as e:
-            print_with_format(f"Error creating activity log {new}")
+            app_utils.print_with_format(f"Error creating activity log {new}")
             self.session.rollback()
             raise
         finally:
@@ -69,10 +72,10 @@ class Hobbies():
         """
         try:
             result = self.session.query(ActivityLog).all()
-            print_with_format(f"Activity logs retrieved successfully")
+            app_utils.print_with_format(f"Activity logs retrieved successfully")
             return result
         except Exception as e:
-            print_with_format(f"Error retrieving activity logs")
+            app_utils.print_with_format(f"Error retrieving activity logs {e}")
             raise
         finally:
             self.session.close()

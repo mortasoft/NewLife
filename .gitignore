@@ -158,3 +158,38 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# DB DATA
+db_data/
+db-data/#ib_16384_0.dblwr
+db-data/#ib_16384_1.dblwr
+db-data/auto.cnf
+db-data/binlog.000001
+db-data/binlog.000002
+db-data/binlog.000003
+db-data/binlog.000004
+db-data/binlog.000005
+db-data/binlog.000006
+db-data/binlog.000007
+db-data/binlog.000008
+db-data/binlog.000009
+db-data/binlog.000010
+db-data/binlog.000011
+db-data/binlog.000012
+db-data/binlog.index
+db-data/ca-key.pem
+db-data/ca.pem
+db-data/client-cert.pem
+db-data/client-key.pem
+db-data/ib_buffer_pool
+db-data/ibdata1
+db-data/ibtmp1
+db-data/mysql_upgrade_history
+db-data/mysql.ibd
+db-data/mysql.sock
+db-data/private_key.pem
+db-data/public_key.pem
+db-data/server-cert.pem
+db-data/server-key.pem
+db-data/undo_001
+db-data/undo_002

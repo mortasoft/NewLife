@@ -7,3 +7,4 @@ sqlalchemy
 sqlalchemy_utils
 watchdog
 colorama
+cryptography

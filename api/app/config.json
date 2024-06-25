@@ -1,10 +1,5 @@
 {
-    "host": "0.0.0.0",
-    "port": "5100",
-    "version" : "v0.1",
-    "url_base" : "/v1",
-    "entorno": "desarrollo",
-    "favicon" : "https://www.cgr.go.cr/imagescgr/imgs/cgr-favicon/cgr-favicon.ico",
+    "version" : "v1",
     "descripcion_api" : "API de Mortasoft.xyz para el uso de las aplicaciones implementadas",
     "tags": [
         {"name": "Finanzas Personales", "description": "Aplicación para el control de las finanzas personales"},
