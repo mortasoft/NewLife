@@ -193,3 +193,5 @@ db-data/server-cert.pem
 db-data/server-key.pem
 db-data/undo_001
 db-data/undo_002
+db-data/binlog.000013
+db-data/binlog.000014

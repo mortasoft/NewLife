@@ -1,10 +1,6 @@
 {
     "version" : "v1",
-    "descripcion_api" : "API de Mortasoft.xyz para el uso de las aplicaciones implementadas",
-    "tags": [
-        {"name": "Finanzas Personales", "description": "Aplicación para el control de las finanzas personales"},
-        {"name": "LifeApp", "description": "Aplicación para la gestión de tareas"}
-    ],
+    "descripcion_api" : "API for all the Mortasoft.xyz applications",
     "servers":[
         {   "name": "Servidor de Desarrollo",
             "url": "http://localhost:5100"

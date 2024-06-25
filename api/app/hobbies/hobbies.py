@@ -32,12 +32,13 @@ class ActivityLog(Base):
 
    
 class Hobbies():
-    def __init__(self,db) -> None:
+    def __init__(self) -> None:
         try:
+            db = DB()
             self.session = db.session
-            app_utils.print_with_format(f"The database session was assigned successfully to the Hobbies class.")
+            app_utils.print_with_format(f"The database session was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
-            app_utils.print_with_format(f"Error creating session in Hobbies class {e}")    
+            app_utils.print_with_format_error(f"Error creating session in {BASE_NAME} class {e}")    
             raise
     
     def add_activity(self, date, title, rating, category):
@@ -57,7 +58,7 @@ class Hobbies():
             self.session.commit()
             app_utils.print_with_format(f"Activity log {new} created successfully")
         except Exception as e:
-            app_utils.print_with_format(f"Error creating activity log {new}")
+            app_utils.print_with_format_error(f"Error creating activity log {new}")
             self.session.rollback()
             raise
         finally:
@@ -75,7 +76,7 @@ class Hobbies():
             app_utils.print_with_format(f"Activity logs retrieved successfully")
             return result
         except Exception as e:
-            app_utils.print_with_format(f"Error retrieving activity logs {e}")
+            app_utils.print_with_format_error(f"Error retrieving activity logs {e}")
             raise
         finally:
             self.session.close()

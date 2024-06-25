@@ -10,7 +10,7 @@ sys.path.append('..')
 
 # Check if the .env file exists
 if not os.path.exists('.env'):
-    app_utils.print_with_format_error("The .env file does not exist. You need to create it. Exiting...")
+    app_utils.print_with_format_error("The .env files does not exist. You need to create it. Exiting...")
     sys.exit()
 else:
     app_utils.print_with_format("The .env file exists. Loading variables...")
@@ -29,13 +29,12 @@ else:
 
 # APIFlask instance
 app = APIFlask(__name__, title=API_TITLE , version=version)
-app.config['DOCS_FAVICON'] = CONFIG.get("favicon")
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
 
 # openapi.info.description
 app.config['DESCRIPTION'] = CONFIG.get("descripcion_api")
-app.config['SERVERS'] = CONFIG.get("servers")
+#app.config['SERVERS'] = CONFIG.get("servers")
 
 @app.route("/" )
 @app.doc(hide=True)
@@ -43,8 +42,8 @@ def home():
     return redirect("/docs", code=302)
 
 # Configure the endpoints
-import hobbies.endpoints as hobbies
-hobbies.configure_endpoints(app)
+import hobbies.endpoints as hobbies;hobbies.configure_endpoints(app)
+import health.endpoints as health;health.configure_endpoints(app)
 
 
 app.run(debug=True,host=API_HOST,port=API_PORT)

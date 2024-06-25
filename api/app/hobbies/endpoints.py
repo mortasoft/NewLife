@@ -1,14 +1,13 @@
 from flask import jsonify
+import utils as app_utils
 
 from apiflask import Schema
 from apiflask.fields import Integer as apiInteger, String as apiString, Date as apiDate
 from apiflask.validators import Length as apiLength, OneOf as apiOneOf, Range as apiRange
-
-import utils as app_utils
+from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
 
 from hobbies.hobbies import Hobbies
 from hobbies.db import *
-from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
 
 
 class AddActivity(Schema):
@@ -26,11 +25,10 @@ def configure_endpoints(app):
     
     try:
         
-        database = DB()
-        hobbies = Hobbies(database)
+        hobbies = Hobbies()
 
         @app.post('/hobbies/add-activity/')
-        @app.doc(tags=['LifeApp'])
+        @app.doc(tags=['Hobbies'],description='Add an activity log to the database.')
         @app.input(AddActivity, location='json')
         @app.output(Result, status_code=201)
         def add_activity(json_data):
@@ -41,7 +39,7 @@ def configure_endpoints(app):
                 return jsonify({'result': 'error', 'message': str(e)})
             
         @app.get('/hobbies/get-activity-log/')
-        @app.doc(tags=['LifeApp'])
+        @app.doc(tags=['Hobbies'],description='Get all the activity logs from the database.')
         @app.output(Result, status_code=200)
         def get_hobbies():
             result = hobbies.get_hobbies()
