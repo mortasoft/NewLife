@@ -1,0 +1,11 @@
+food_type, name, portion, example, recipe, price
+Desayuno, Galletas de soda y frijoles molidos, 1, 2 Galletas de soda con frijoles, Cojer las galletas y echarle frijoles, 1500
+Merienda Mañana, Uvas, 1, 1 racimo de uvas, Cojer el racimo de uvas y comerlas, 1000
+Almuerzo, Spaguetti con carne molida, 1, 1 plato de spaguetti con carne molida, Cojer el plato de spaguetti con carne molida y comerlo, 2000
+Merienda Tarde, Palomitas + Jugo Frutas, 1, 1 bolsa de palomitas con un vaso de jugo de frutas, Cojer la bolsa de palomitas y el vaso de jugo de frutas y comerlo, 1500
+Cena, Galletas con Atún, 1, 2 galletas con atún, Cojer las galletas y echarle atún, 1500
+Merienda Nocturna, Barrita Special K + Taza de leche, 1, 1 barrita Special K con una taza de leche, Cojer la barrita Special K y la taza de leche y comerlo, 1500
+Desayuno, Sandwitch de jamón y queso, 1, 1 sandwitch de jamón y queso, Cojer el sandwitch y comerlo, 1500
+Almuerzo, Chop Suey, 1, 1 plato de chop suey, Cojer el plato de chop suey y comerlo, 2000
+Cena, Perro Caliente, 1, 1 perro caliente, Cojer el perro caliente y comerlo, 3000
+Almuerzo, Fajitas de Carnes, 1, 1 plato de fajitas de carnes, Cojer el plato de fajitas de carnes y comerlo, 2500

@@ -3,11 +3,11 @@
     "descripcion_api" : "API for all the Mortasoft.xyz applications",
     "servers":[
         {   "name": "Servidor de Desarrollo",
-            "url": "http://localhost:5100"
+            "url": "http://localhost:5000"
         },
         {
             "name": "Servidor de Producción",
-            "url": "https://api.mortasoft.xyz"
+            "url": "http://localhost:5100"
         }
     ]
 }

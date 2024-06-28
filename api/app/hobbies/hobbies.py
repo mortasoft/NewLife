@@ -1,25 +1,22 @@
-import sys,os
-from hobbies.db import *
 from dataclasses import dataclass
+from sqlalchemy import create_engine, ForeignKey, String, Integer, Date, Column, Numeric, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
+from database import Database
 import utils as app_utils
+#from utils import generate_uuid, print_with_format, print_with_format_error
 
 BASE_NAME = "hobbies"
 
 @dataclass
-class ActivityLog(Base):
+class ActivityLog(Database.Base):
     __tablename__ = BASE_NAME + "_" +  'activity_log'
     
-    id: str
-    date: str
-    title: str
-    rating: int
-    category: str
-        
-    id = Column("id", String(36), primary_key=True, default=generate_uuid)
-    date = Column("date", Date())
-    title = Column("title", String(60)) 
-    rating = Column("rating", Integer)
-    category = Column("category", String(40))
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=app_utils.generate_uuid)
+    date: Mapped[Date] = mapped_column(Date())
+    title: Mapped[str] = mapped_column(String(60))
+    rating: Mapped[int] = mapped_column(Integer)
+    category: Mapped[str] = mapped_column(String(40))
     
     def __init__(self, date, title, rating, category):
         self.date = date
@@ -31,14 +28,14 @@ class ActivityLog(Base):
         return f"[Date={self.date}, Title={self.title}, Rating={self.rating}, Category={self.category}]"
 
    
-class Hobbies():
-    def __init__(self) -> None:
+class HobbieManager():
+    def __init__(self, database) -> None:
         try:
-            db = DB()
-            self.session = db.session
-            app_utils.print_with_format(f"The database session was assigned successfully to the {BASE_NAME} class.")
+            self.db = database
+            self.session = database.Session()
+            app_utils.print_with_format(f"[Hobbies] The database session was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating session in {BASE_NAME} class {e}")    
+            app_utils.print_with_format_error(f"[Hobbies] Error creating session in {BASE_NAME} class {e}")    
             raise
     
     def add_activity(self, date, title, rating, category):
@@ -56,11 +53,13 @@ class Hobbies():
         try:
             self.session.add(new)
             self.session.commit()
+            self.session.refresh(new)
             app_utils.print_with_format(f"Activity log {new} created successfully")
+            return new
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating activity log {new}")
+            app_utils.print_with_format_error(f"Error creating activity log {new} {e}")
             self.session.rollback()
-            raise
+            return None
         finally:
             self.session.close()       
         
@@ -72,9 +71,20 @@ class Hobbies():
             list: List of activity logs.
         """
         try:
-            result = self.session.query(ActivityLog).all()
+            result = self.session.query(ActivityLog).order_by(ActivityLog.date).all()
+            formatted_result = []
+            for activity in result:
+                formatted_date = activity.date.strftime("%Y-%m-%d")
+                formatted_activity = {
+                    "id": activity.id,
+                    "date": formatted_date,
+                    "title": activity.title,
+                    "rating": activity.rating,
+                    "category": activity.category
+                }
+                formatted_result.append(formatted_activity)
             app_utils.print_with_format(f"Activity logs retrieved successfully")
-            return result
+            return formatted_result
         except Exception as e:
             app_utils.print_with_format_error(f"Error retrieving activity logs {e}")
             raise

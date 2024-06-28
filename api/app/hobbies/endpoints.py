@@ -4,11 +4,9 @@ import utils as app_utils
 from apiflask import Schema
 from apiflask.fields import Integer as apiInteger, String as apiString, Date as apiDate
 from apiflask.validators import Length as apiLength, OneOf as apiOneOf, Range as apiRange
-from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
-
-from hobbies.hobbies import Hobbies
-from hobbies.db import *
-
+from hobbies.hobbies import HobbieManager
+from datetime import date, timedelta
+from random import randint
 
 class AddActivity(Schema):
     date = apiDate(required=True) 
@@ -17,19 +15,21 @@ class AddActivity(Schema):
     category = apiString(required=True, validate=apiOneOf(['Cine', 'Pelicula', 'Serie', 'Juego', 'Libro', 'Anime', 'Otro'])) 
 
 class Result(Schema):
-    result = String()
-    message = String()
-    
+    result = apiString()
+    message = apiString()
 
-def configure_endpoints(app):
+def random_date():
+    return date(2024, randint(1, 12), randint(1, 28)).strftime('%Y-%m-%d')
+
+def configure_endpoints(app, database):
     
     try:
         
-        hobbies = Hobbies()
+        hobbies = HobbieManager(database=database)
 
         @app.post('/hobbies/add-activity/')
         @app.doc(tags=['Hobbies'],description='Add an activity log to the database.')
-        @app.input(AddActivity, location='json')
+        @app.input(AddActivity, location='json', example={'date': random_date(), 'title': 'The title of the activity', 'rating': 10, 'category': 'Cine'})
         @app.output(Result, status_code=201)
         def add_activity(json_data):
             try:
