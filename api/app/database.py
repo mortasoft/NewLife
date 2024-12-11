@@ -1,4 +1,4 @@
-from utils import print_with_format, print_with_format_error
+from utils import print_with_format
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 from sqlalchemy.ext.declarative import declarative_base
@@ -40,7 +40,7 @@ class Database():
             self.state = True
             
         except Exception as e:
-            print_with_format_error(f"[Utils.DB] Error connecting to the database {e}. Exiting...")
+            print_with_format(f"[Utils.DB] Error connecting to the database {e}. Exiting...", type="error")
             self.state = False
                
     def create_all_tables(self):

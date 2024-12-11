@@ -8,6 +8,14 @@
         {
             "name": "Servidor de Producción",
             "url": "http://localhost:5100"
+        },
+        {
+            "name": "Servidor de v2",
+            "url": "http://192.168.1.110:5000"
+        },
+        {
+            "name": "Servidor de v3",
+            "url": "https://localhost:5000"
         }
     ]
 }

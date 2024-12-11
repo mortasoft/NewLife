@@ -4,7 +4,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
 from database import Database
 import utils as app_utils
-#from utils import generate_uuid, print_with_format, print_with_format_error
 
 BASE_NAME = "hobbies"
 
@@ -35,7 +34,7 @@ class HobbieManager():
             self.session = database.Session()
             app_utils.print_with_format(f"[Hobbies] The database session was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
-            app_utils.print_with_format_error(f"[Hobbies] Error creating session in {BASE_NAME} class {e}")    
+            app_utils.print_with_format(f"[Hobbies] Error creating session in {BASE_NAME} class {e}", type="error")    
             raise
     
     def add_activity(self, date, title, rating, category):
@@ -57,7 +56,7 @@ class HobbieManager():
             app_utils.print_with_format(f"Activity log {new} created successfully")
             return new
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating activity log {new} {e}")
+            app_utils.print_with_format(f"Error creating activity log {new} {e}", type="error")
             self.session.rollback()
             return None
         finally:
@@ -86,7 +85,7 @@ class HobbieManager():
             app_utils.print_with_format(f"Activity logs retrieved successfully")
             return formatted_result
         except Exception as e:
-            app_utils.print_with_format_error(f"Error retrieving activity logs {e}")
+            app_utils.print_with_format(f"Error retrieving activity logs {e}", type="error")
             raise
         finally:
             self.session.close()

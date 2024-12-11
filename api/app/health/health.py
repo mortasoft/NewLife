@@ -11,26 +11,31 @@ class Weight(Database.Base):
     __tablename__ = BASE_NAME + "_" +  'weight'
     
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=app_utils.generate_uuid)
-    date: Mapped[Date] = mapped_column(Date())
-    weight: Mapped[float] = mapped_column(Numeric(5,2))
-    imc: Mapped[float] = mapped_column(Float)
-    bodyFat: Mapped[float] = mapped_column(Float)
-    subcutaneousFat: Mapped[float] = mapped_column(Float)
-    viseralFat: Mapped[float] = mapped_column(Float)
-    muscleMass: Mapped[float] = mapped_column(Float)
+    date: Mapped[Date] = mapped_column(Date, nullable=False)
+    weight: Mapped[float] = mapped_column(Numeric(5, 2), nullable=False)
+    imc: Mapped[float] = mapped_column(Float, nullable=False)
+    body_fat: Mapped[float] = mapped_column(Float)
+    subcutaneous_fat: Mapped[float] = mapped_column(Float)
+    visceral_fat: Mapped[float] = mapped_column(Float)
+    muscle_mass: Mapped[float] = mapped_column(Float)
     
-    def __init__(self, date, weight, imc, bodyFat, subcutaneousFat, viseralFat, muscleMass):
+    def __init__(self, date, weight, imc, body_fat=None, subcutaneous_fat=None, 
+                 visceral_fat=None, muscle_mass=None):
         self.date = date
         self.weight = weight
         self.imc = imc
-        self.bodyFat = bodyFat
-        self.subcutaneousFat = subcutaneousFat
-        self.viseralFat = viseralFat
-        self.muscleMass = muscleMass
+        self.body_fat = body_fat
+        self.subcutaneous_fat = subcutaneous_fat
+        self.visceral_fat = visceral_fat
+        self.muscle_mass = muscle_mass
     
-    def __repr__(self) -> str:
-        return f"[Date={self.date}, Weight={self.weight}, IMC={self.imc}, Body Fat={self.bodyFat}, Subcutaneous Fat={self.subcutaneousFat}, Viseral Fat={self.viseralFat}, Muscle Mass={self.muscleMass}]"
-
+    def __repr__(self):
+        return (
+            f"Weight(id={self.id}, date={self.date}, weight={self.weight}, "
+            f"imc={self.imc}, body_fat={self.body_fat}, "
+            f"subcutaneous_fat={self.subcutaneous_fat}, "
+            f"visceral_fat={self.visceral_fat}, muscle_mass={self.muscle_mass})"
+        )
 
 @dataclass
 class Nutrition(Database.Base):
@@ -98,10 +103,10 @@ class HealthManager():
             self.session = database.Session()
             app_utils.print_with_format(f"[Health] The database session was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
-            app_utils.print_with_format_error(f"[Health] Error creating session in {BASE_NAME} class {e}")    
+            app_utils.print_with_format(f"[Health] Error creating session in {BASE_NAME} class {e}", type="error")    
             raise
     
-    def add_weight(self, date, weight, imc, bodyFat, subcutaneousFat, viseralFat, muscleMass): 
+    def add_weight(self, date, weight, imc, body_fat, subcutaneous_fat, visceral_fat, muscle_mass): 
         """
         Adds a weight log to the database.
         
@@ -114,14 +119,18 @@ class HealthManager():
             viseralFat (float): The viseral fat of the weight log.
             muscleMass (float): The muscle mass of the weight log.
         """
-        new = Weight(date, weight, imc, bodyFat, subcutaneousFat, viseralFat, muscleMass)
+        new = Weight(date, weight, imc, body_fat, subcutaneous_fat, visceral_fat, muscle_mass)
         try:
             with self.session as session:
                 session.add(new)
                 session.commit()
                 app_utils.print_with_format(f"Weight log {new} created successfully")
+                return app_utils.Response('success', f"Weight log created successfully", 201)
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating activity log {new}")
+            self.session.rollback()
+            app_utils.print_with_format(f"Error creating weight log {new} {e}", type="error")
+            return app_utils.Response('error', f"Error creating weight log {new} {e}", 500)
+
         
         
     def get_weights(self):
@@ -136,7 +145,7 @@ class HealthManager():
             app_utils.print_with_format(f"Activity logs retrieved successfully")
             return result
         except Exception as e:
-            app_utils.print_with_format_error(f"Error retrieving activity logs {e}")
+            app_utils.print_with_format(f"Error retrieving activity logs {e}", type="error")
             raise
         finally:
             self.session.close()       
@@ -161,7 +170,7 @@ class HealthManager():
                 session.commit()
                 app_utils.print_with_format(f"Nutrition log {new} created successfully")
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating nutrition log {new}")
+            app_utils.print_with_format(f"Error creating nutrition log {new}", type="error")
             self.session.rollback()
             raise
         finally:
@@ -180,7 +189,7 @@ class HealthManager():
             app_utils.print_with_format(f"Nutrition logs retrieved successfully")
             return result
         except Exception as e:
-            app_utils.print_with_format_error(f"Error retrieving nutrition logs {e}")
+            app_utils.print_with_format(f"Error retrieving nutrition logs {e}", type="error")
             raise
         finally:
             self.session.close()       
@@ -196,7 +205,7 @@ class HealthManager():
                 session.commit()
                 app_utils.print_with_format(f"Menu {new_menu} created successfully")
         except Exception as e:
-            app_utils.print_with_format_error(f"Error creating menu {new_menu}")
+            app_utils.print_with_format(f"Error creating menu {new_menu}", type="error")
     
     def create_week_menu(self, menu_week_id, menu):
         """
@@ -225,7 +234,7 @@ class HealthManager():
             app_utils.print_with_format(f"Menu retrieved successfully")
             return result
         except Exception as e:
-            app_utils.print_with_format_error(f"Error retrieving menu {e}")
+            app_utils.print_with_format(f"Error retrieving menu {e}", type="error")
             raise
         finally:
             self.session.close()       

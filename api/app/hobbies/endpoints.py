@@ -46,5 +46,5 @@ def configure_endpoints(app, database):
             return jsonify(result)
     
     except Exception as e:
-        app_utils.print_with_format_error(e)
+        app_utils.print_with_format(e, type="error")
 
