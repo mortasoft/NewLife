@@ -5,6 +5,9 @@
         {   "name": "Servidor de Desarrollo",
             "url": "http://localhost:5000"
         },
+        {   "name": "Servidor de Desarrollo",
+            "url": "http://127.0.0.1:5100"
+        },
         {
             "name": "Servidor de Producción",
             "url": "http://localhost:5100"

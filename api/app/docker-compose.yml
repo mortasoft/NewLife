@@ -1,0 +1,7 @@
+services:
+  newlife-api:
+    image: newlife-api:latest
+    ports:
+      - "5100:5000"
+    env_file:
+      - .env
