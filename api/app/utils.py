@@ -34,7 +34,7 @@ def print_with_format(text, type="message", debug=True):
         - e: error
     """
     
-    if os.getenv("API_DEBUG").lower() == "true":
+    if os.getenv("API_DEBUG") and os.getenv("API_DEBUG").lower() == "true":
         date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if type=="message":
             formatted_text = f"[{Fore.GREEN}{date}{Style.RESET_ALL}] | {text}"
@@ -45,7 +45,7 @@ def print_with_format(text, type="message", debug=True):
         print(formatted_text)
 
     # Configure logging
-    if(os.getenv("LOGGING_ENABLED")).lower() == "true":
+    if os.getenv("LOGGING_ENABLED") and os.getenv("LOGGING_ENABLED").lower() == "true":
         logging.basicConfig(filename='app.log', level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
         logging.info(formatted_text)  # Guarda el mensaje formateado en el log
