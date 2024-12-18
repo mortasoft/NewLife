@@ -8,6 +8,7 @@ import utils as app_utils
 from database import Database
 from hobbies.hobbies import ActivityLog
 from health.health import Weight, Nutrition
+from goals.goals import Goal, Objective
 
 # Add the parent directory to the sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -93,6 +94,9 @@ hobbies_endpoints.configure_endpoints(app, database=database)
 
 import health.endpoints as health_endpoints
 health_endpoints.configure_endpoints(app, database=database)
+
+import goals.endpoints as goals_endpoints
+goals_endpoints.configure_endpoints(app, database=database)
 
 # --- Run the app ---
 if __name__ == '__main__':

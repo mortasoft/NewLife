@@ -25,7 +25,7 @@ def read_config_file(dir):
         sys.exit()
 
 
-def print_with_format(text, type="message", debug=True):
+def print_with_format(text, type="message"):
     """
     Prints a message with a specific format.
     type can be:
@@ -34,14 +34,18 @@ def print_with_format(text, type="message", debug=True):
         - e: error
     """
     
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     if os.getenv("API_DEBUG") and os.getenv("API_DEBUG").lower() == "true":
-        date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if type=="message":
             formatted_text = f"[{Fore.GREEN}{date}{Style.RESET_ALL}] | {text}"
         elif type=="warning":
             formatted_text = f"[{Fore.YELLOW}{date}{Style.RESET_ALL}] | {text}"
         elif type=="error":
             formatted_text = f"[{Fore.RED}{date}{Style.RESET_ALL}] | {text}"
+        print(formatted_text)
+    else:
+        formatted_text = f"[{Fore.RED}{date}{Style.RESET_ALL}] | {text}"
         print(formatted_text)
 
     # Configure logging
