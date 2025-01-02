@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from sqlalchemy import create_engine, ForeignKey, String, Integer, Date, Boolean, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.exc import IntegrityError
 
 import utils as app_utils
 from database import Database
@@ -17,7 +18,7 @@ class Goal(Database.Base):
     date: Mapped[Date] = mapped_column(Date, nullable=False)
     
     # Objectives related to the goal
-    objectives: Mapped["Objective"] = relationship("Objective", back_populates="goal")
+    objectives: Mapped["Objective"] = relationship("Objective", back_populates="goal", lazy='joined')
     
     def __init__(self, name, description, date):
         self.name = name
@@ -51,7 +52,7 @@ class Objective(Database.Base):
     goal_id: Mapped[str] = mapped_column(String(36), ForeignKey(BASE_NAME + "_goal.id"), nullable=False)
     
     # Relationship back to Goal
-    goal: Mapped["Goal"] = relationship("Goal", back_populates="objectives")
+    goal: Mapped["Goal"] = relationship("Goal", back_populates="objectives", lazy='joined')
     
         # Usamos el decorador @validates para validaciones automáticas
     @validates('start_value')
@@ -85,8 +86,7 @@ class GoalManager():
     def __init__(self,database) -> None:
         try:
             self.db = database
-            self.session = database.Session()
-            app_utils.print_with_format(f"[Goal] The database session was assigned successfully to the {BASE_NAME} class.")
+            app_utils.print_with_format(f"[Goal] The database was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
             app_utils.print_with_format(f"[Goal] Error creating session in {BASE_NAME} class {e}", type="error")    
             raise
@@ -99,10 +99,10 @@ class GoalManager():
         new = Goal(name, description, date)
 
         try:
-            with self.session as session:
+            with self.db.Session() as session:
                 session.add(new)
                 session.commit()
-                message = f"Goal {new} created successfully"
+                message = f"[Goal] {new} created successfully"
                 app_utils.print_with_format(message)
                 return app_utils.Response('success', message, 201)
         except Exception as e:
@@ -118,15 +118,14 @@ class GoalManager():
             list: List of goals.
         """
         try:
-            result = self.session.query(Goal).all()
-            app_utils.print_with_format(f"Goals retrieved successfully")
-            return result
+            with self.db.Session() as session:
+                result = session.query(Goal).all()
+                app_utils.print_with_format(f"Goals retrieved successfully")
+                return result
         except Exception as e:
             app_utils.print_with_format(f"Error retrieving goals {e}", type="error")
-            raise
-        finally:
-            self.session.close()       
-            pass
+            return app_utils.Response('error', f"Error retrieving goals {e}", 500)
+            
         
     def add_objective(self, name, description, goal, start_number=None, end_number=None, 
                       is_boolean=False, start_value=None, end_value=None, currency_unit=None):
@@ -144,33 +143,37 @@ class GoalManager():
             end_value (Float): The end value of the objective.
             currency_unit (str): The currency unit of the objective.
         """
-        goal_instance=self.session.query(Goal).filter(Goal.id == goal).first()
-        self.session.add(goal_instance)
-        
-        # Create the new objective object
-        new = Objective(
-                name=name,
-                description=description,
-                goal_id=goal_instance,
-                start_number=start_number,
-                end_number=end_number,
-                is_boolean=is_boolean,
-                start_value=start_value,
-                end_value=end_value,
-                currency_unit=currency_unit
-            )
-            
         try:
-            with self.session as session:
-                session.add(new)
+            with self.db.Session() as session:
+                goal_instance=session.query(Goal).filter(Goal.id == goal).first()
+                
+                # Create the new objective object
+                new_objective = Objective(
+                    name=name,
+                    description=description,
+                    goal_id=goal_instance,
+                    start_number=start_number,
+                    end_number=end_number,
+                    is_boolean=is_boolean,
+                    start_value=start_value,
+                    end_value=end_value,
+                    currency_unit=currency_unit
+                )
+                
+                #session.add(goal_instance)
+                session.add(new_objective)
                 session.commit()
-                message = f"Objective {new} created successfully"
+                message = f"Objective {new_objective} created successfully"
                 app_utils.print_with_format(message)
                 return app_utils.Response('success', message, 201)
+        except IntegrityError as e:
+            app_utils.print_with_format(f"The id cannot be null or not exist  {e}", type="error")
+            self.db.Session().rollback()
+            return app_utils.Response('error', f"Error creating goal {e}", 500)
         except Exception as e:
-            app_utils.print_with_format(f"Error creating objective {new} {e}", type="error")
-            self.session.rollback()
-            return app_utils.Response('error', f"Error creating goal {new} {e}", 500)      
+            app_utils.print_with_format(f"Error creating objective {e}", type="error")
+            self.db.Session().rollback()
+            return app_utils.Response('error', f"Error creating goal {e}", 500)      
         
     def get_objectives(self):
         """
@@ -180,12 +183,12 @@ class GoalManager():
             list: List of objectives.
         """
         try:
-            result = self.session.query(Objective).all()
+            result = self.db.Session().query(Objective).all()
             app_utils.print_with_format(f"Objectives retrieved successfully")
             return result
         except Exception as e:
             app_utils.print_with_format(f"Error retrieving objectives {e}", type="error")
-            self.session.rollback()
+            self.db.Session().rollback()
             return app_utils.Response('error', f"Error creating goal {e}", 500)    
         
     def get_objectives_by_goal(self, goal_id):
@@ -199,10 +202,10 @@ class GoalManager():
             list: List of objectives.
         """
         try:
-            result = self.session.query(Objective).filter(Objective.goal_id == goal_id).all()
+            result = self.db.Session().query(Objective).filter(Objective.goal_id == goal_id).all()
             app_utils.print_with_format(f"Objectives retrieved successfully")
             return result
         except Exception as e:
             app_utils.print_with_format(f"Error retrieving objectives {e}", type="error")
-            self.session.rollback()
+            self.db.Session().rollback()
             return app_utils.Response('error', f"Error creating goal {e}", 500) 

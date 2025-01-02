@@ -78,10 +78,10 @@ app.config['SERVERS'] = CONFIG.get("servers")
 # Initialize database connection
 db_config = get_db_config()
 database = Database(**db_config) 
+
 if not database.state:
     app_utils.print_with_format("[MAIN] Error connecting to the database. Exiting...", type="error")
     sys.exit()
-
 
 # --- Routes ---
 @app.route("/")

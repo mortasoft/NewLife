@@ -68,10 +68,16 @@ def configure_endpoints(app,database):
             
         @app.get('/goal/get-goals/')
         @app.doc(tags=['Goal'],description='Get all goals from the database.')
-        @app.output(Result, status_code=200)
-        def get_goal():
-            result = goals.get_goals()
-            return jsonify(result)
+        @app.output(AddGoal(many=True), status_code=200)  # Usar el esquema para serializar la respuesta
+        #@app.output(Result, status_code=200)
+        def get_goals():
+            try:
+                result = goals.get_goals()
+                print(AddGoal.dump(result))
+                return jsonify(result)
+            except Exception as e:
+                app_utils.print_with_format(f"[get-goals] {e} {e.__class__}", type="error")
+                return jsonify({'result': 'error', 'message': str(e)})
         
         
         @app.post('/goal/add-objective/')
@@ -80,14 +86,14 @@ def configure_endpoints(app,database):
         @app.output(Result, status_code=201)
         def add_objective(json_data):
             try:
-                goals.add_objective(json_data['name'], json_data['description'], json_data['goal_id'], json_data['start_number'], json_data['end_number'], json_data['is_boolean'], json_data['start_value'], json_data['end_value'], json_data['currency_unit'])
-                return jsonify({'result': 'success', 'message': 'Objective added successfully'})
+                response = goals.add_objective(json_data['name'], json_data['description'], json_data['goal_id'], json_data['start_number'], json_data['end_number'], json_data['is_boolean'], json_data['start_value'], json_data['end_value'], json_data['currency_unit'])
+                return make_response(jsonify({'result': response.result, 'message': response.message}), response.status_code)
             except NoForeignKeysError as e:
                 app_utils.print_with_format(f"[add-objective] {e} {e.__class__.__name__}",type="error")
                 return jsonify({'result': 'error', 'message': f'Error adding objective. Check the foreign keys. {e}'})
             except Exception as e:
                 app_utils.print_with_format(f"[add-objective] {e} {e.__class__.__name__}", type="error")
-                return jsonify({'result': 'error', 'message': str(e)})
+                return make_response(jsonify({'result': response.result, 'message': response.message}), response.status_code)
             
         @app.get('/goals/get-objectives/')
         @app.doc(tags=['Goal'],description='Get all the objectives from the database.')
