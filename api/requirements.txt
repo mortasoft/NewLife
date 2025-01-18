@@ -8,3 +8,4 @@ sqlalchemy_utils
 watchdog
 colorama
 cryptography
+flask_migrate

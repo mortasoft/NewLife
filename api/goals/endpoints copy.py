@@ -1,19 +1,22 @@
 from flask import jsonify, make_response
 import utils as app_utils
-
 from apiflask import Schema, HTTPError
+from apiflask import APIBlueprint, Schema, input, output
 from apiflask.fields import Integer as apiInteger, String as apiString, Date as apiDate, Decimal as apiDecimal
 from apiflask.validators import Length as apiLength, OneOf as apiOneOf, Range as apiRange
-from goals.goals import GoalManager
-from sqlalchemy.exc import NoForeignKeysError
+from goals.goals import GoalManager, GoalSchema
+from sqlalchemy.exc import NoForeignKeysError, IntegrityError
 
-class AddGoal(Schema):
+# Define the blueprint
+goals_bp = APIBlueprint('goals', __name__, url_prefix='/goals')
+
+class GoalSchema(Schema):
     name = apiString(required=True, validate=apiLength(max=100))
     description = apiString(required=True, validate=apiLength(max=500))
     date = apiDate(required=True)
         
     
-class AddObjective(Schema):
+class ObjectiveSchema(Schema):
     name = apiString(required=True, validate=apiLength(max=100))
     description = apiString(required=True, validate=apiLength(max=500))
     start_number = apiInteger(required=False)
@@ -23,11 +26,19 @@ class AddObjective(Schema):
     end_value = apiDecimal(required=False)
     currency_unit = apiString(required=False, validate=apiLength(max=10))
     goal_id = apiString(required=True, validate=apiLength(max=36))  
-    
+
+
+class ObjectiveSchema(Schema):  # Schema for Objective model
+    id = apiString()
+    name = apiString()
+    # ... other fields as needed
  
 class Result(Schema):
     result = apiString()
     message = apiString()
+    
+    
+
     
 
 def configure_endpoints(app,database):
@@ -40,44 +51,39 @@ def configure_endpoints(app,database):
             for message in field_messages:
                 messages.append(f"{field}: {message}")
 
-        return {
-            "result": "error",
-            "message": messages
-        }, error.status_code
+        return {"result": "error", "message": messages}, error.status_code
     
     try:
         
-        database = database
         goals = GoalManager(database)
 
         @app.post('/goal/add-goal/')
         @app.doc(tags=['Goal'],description='Add a new goal to the database.')
-        @app.input(AddGoal, location='json')
-        @app.output(Result, status_code=201)
+        @app.input(Add_Goal, location='json')
+        @app.output(GoalSchema, status_code=201)
         def add_goal(json_data):
             try:
-                # Extract data from json_data, providing default values for optional fields
-                name = json_data['name']
-                description = json_data['description']
-                date = json_data['date']
-                response = goals.add_goal(name, description, date)
-                return make_response(jsonify({'result': response.result, 'message': response.message}), response.status_code)
+                response = goals.add_goal(**json_data)
+                app_utils.print_with_format(f"[add-goal] {response.result} {response.message}")
+                return make_response(jsonify({'result': response.result, 'message': response.message, 'data': response.data}), response.status_code)
             except Exception as e:
-                app_utils.print_with_format(f"[add-goal] {e} {e.__class__.__name__}", type="error")
+                app_utils.print_with_format(f"[add-goal-error] {e} {e.__class__.__name__}", type="error")
                 return make_response(jsonify({'result': 'error', 'message': str(e)}), 500)
             
         @app.get('/goal/get-goals/')
         @app.doc(tags=['Goal'],description='Get all goals from the database.')
-        @app.output(AddGoal(many=True), status_code=200)  # Usar el esquema para serializar la respuesta
+        #@app.output(Add_Goal(many=True), status_code=200)
         #@app.output(Result, status_code=200)
         def get_goals():
             try:
                 result = goals.get_goals()
-                print(AddGoal.dump(result))
-                return jsonify(result)
+                print(result)
+                return GoalSchema(many=True).dump(result), 200
+                #return make_response(jsonify(result), 201)
             except Exception as e:
                 app_utils.print_with_format(f"[get-goals] {e} {e.__class__}", type="error")
-                return jsonify({'result': 'error', 'message': str(e)})
+                raise HTTPError(500, message=str(e))
+                #return jsonify({'result': 'error', 'message': str(e)})
         
         
         @app.post('/goal/add-objective/')

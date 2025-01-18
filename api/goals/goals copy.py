@@ -1,15 +1,23 @@
+from typing import List
 from dataclasses import dataclass
 from sqlalchemy import create_engine, ForeignKey, String, Integer, Date, Boolean, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
+from apiflask import Schema, fields
 import utils as app_utils
 from database import Database
+
+class Base(DeclarativeBase):
+    pass
 
 BASE_NAME = "goals"
 
 @dataclass
-class Goal(Database.Base):
+class GoalModel(Base):
     __tablename__ = BASE_NAME + "_" +  'goal'
     
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=app_utils.generate_uuid)
@@ -18,18 +26,21 @@ class Goal(Database.Base):
     date: Mapped[Date] = mapped_column(Date, nullable=False)
     
     # Objectives related to the goal
-    objectives: Mapped["Objective"] = relationship("Objective", back_populates="goal", lazy='joined')
+    objectives: Mapped[List["ObjectiveModel"]] = relationship(
+        back_populates="goal", cascade="all, delete-orphan"
+    )
     
     def __init__(self, name, description, date):
         self.name = name
-        self.description = description                 
+        self.description = description
         self.date = date
     
     def __repr__(self):
-        return (f"Goal {self.name} created on {self.date} with description {self.description}")
+        return f"Goal(id={self.id}, name={self.name}, date={self.date})"
+
 
 @dataclass
-class Objective(Database.Base):
+class ObjectiveModel(Base):
     __tablename__ = BASE_NAME + "_" +  'objective'
     
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=app_utils.generate_uuid)
@@ -52,9 +63,9 @@ class Objective(Database.Base):
     goal_id: Mapped[str] = mapped_column(String(36), ForeignKey(BASE_NAME + "_goal.id"), nullable=False)
     
     # Relationship back to Goal
-    goal: Mapped["Goal"] = relationship("Goal", back_populates="objectives", lazy='joined')
+    goal: Mapped["GoalModel"] = relationship("GoalModel", back_populates="objectives")
     
-        # Usamos el decorador @validates para validaciones automáticas
+    # @validates Decorator for automatic validation 
     @validates('start_value')
     def validate_start_value(self, key, value):
         if value is not None and self.end_value is not None and value > self.end_value:
@@ -83,9 +94,9 @@ class Objective(Database.Base):
 
    
 class GoalManager():
-    def __init__(self,database) -> None:
+    def __init__(self,engine) -> None:
         try:
-            self.db = database
+            self.engine = engine
             app_utils.print_with_format(f"[Goal] The database was assigned successfully to the {BASE_NAME} class.")
         except Exception as e:
             app_utils.print_with_format(f"[Goal] Error creating session in {BASE_NAME} class {e}", type="error")    
@@ -95,20 +106,24 @@ class GoalManager():
         """
         Adds a goal to the database.
         """
-        
-        new = Goal(name, description, date)
+        with Session(self.engine) as session:
+            new = GoalModel(name=name, description=description, date=date)
+            session.add(new)
+            session.flush()
+            session.commit()
+            message = f"[Goal] {new} created successfully"
+            app_utils.print_with_format(message)
+            
 
-        try:
-            with self.db.Session() as session:
-                session.add(new)
-                session.commit()
-                message = f"[Goal] {new} created successfully"
-                app_utils.print_with_format(message)
-                return app_utils.Response('success', message, 201)
-        except Exception as e:
-            self.session.rollback()
-            app_utils.print_with_format(f"Error creating goal {new} {e}", type="error")
-            return app_utils.Response('error', f"Error creating goal {new} {e}", 500)
+        
+        
+        
+        with self.db.Session() as session:
+                return app_utils.Response('success', message, 201, Go.dump(self, new, many=False))
+            except Exception as e:
+                self.db.Session().rollback()
+                app_utils.print_with_format(f"Error creating goal {e}", type="error")
+                return app_utils.Response('error', f"Error creating goal {e}", 500)
         
     def get_goals(self):
         """
@@ -119,9 +134,10 @@ class GoalManager():
         """
         try:
             with self.db.Session() as session:
-                result = session.query(Goal).all()
-                app_utils.print_with_format(f"Goals retrieved successfully")
-                return result
+                stmt = select(Goal).options(joinedload(Goal.objectives))
+                result = session.execute(stmt)
+                goals = result.scalars().all()
+                return goals
         except Exception as e:
             app_utils.print_with_format(f"Error retrieving goals {e}", type="error")
             return app_utils.Response('error', f"Error retrieving goals {e}", 500)
