@@ -22,7 +22,7 @@ class GoalModel(Base):
     __tablename__ = BASE_NAME + "_" +  'goal'
     
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=app_utils.generate_uuid)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, info={"example": "a1b2c3d4-e5f6-7890-1234-567890abcdef"})
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     date: Mapped[Date] = mapped_column(Date, nullable=False)
     
@@ -97,6 +97,12 @@ class ObjectiveModel(Base):
 class GoalManager():
     def __init__(self,engine) -> None:
             self.engine = engine
+            
+    def create_tables(self):
+        """
+        Create tables in the database.
+        """
+        Base.metadata.create_all(self.engine)
     
     def add_goal(self, name, description, date):
         """
@@ -108,3 +114,22 @@ class GoalManager():
             session.flush()
             session.commit()
             return {'data': new_goal, 'message': app_utils.generate_message(new_goal,'create'), 'result': 'ok', 'status_code': 200}
+    
+    def get_goals(self):
+        """
+        Get all goals from the database.
+        """
+        with Session(self.engine) as session:
+            goals = session.query(GoalModel).all()
+            return {'data': goals, 'message': app_utils.generate_message(None,'get'), 'result': 'ok', 'status_code': 200}
+        
+    def get_goal(self, goal_id):
+        """
+        Get a goal by its ID.
+        """
+        with Session(self.engine) as session:
+            goal = session.query(GoalModel).filter(GoalModel.id == goal_id).first()
+            if goal:
+                return {'data': goal, 'message': app_utils.generate_message(goal,'get'), 'result': 'ok', 'status_code': 200}
+            else:
+                return {'data': None, 'message': app_utils.generate_message(goal,'get'), 'result': 'error', 'status_code': 404}

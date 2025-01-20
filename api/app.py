@@ -6,6 +6,7 @@ import utils as app_utils
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base
 
 # Add the parent directory to the sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -29,6 +30,12 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 engine = create_engine(CONFIG.SQLALCHEMY_DATABASE_URI)
 
+# Define the base for declarative models
+Base = declarative_base()
+with app.app_context():  # Use app context
+        Base.metadata.create_all(engine) # Create tables
+
+
 # --- Routes ---
 @app.route("/")
 @app.doc(hide=True)
@@ -38,6 +45,9 @@ def home():
 # Import and configure endpoints
 import goals.endpoints as goals_endpoints
 goals_endpoints.configure_endpoints(app, engine)
+
+
+
 
 # --- Run the app ---
 if __name__ == '__main__':

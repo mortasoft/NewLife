@@ -22,27 +22,44 @@ class BaseResponse(Schema):
     message = String()
     status_code = Integer()
     data = Field()
+    
+# ENUM for the result of the operation
+class ResultEnum:
+    OK = "ok"
+    ERROR = "error"
+    NOT_FOUND = "not_found"
 
 
 def generate_message(object, type):
-    if type == "create":
-        print_with_format(f"[{object}] created successfully.")
-        return f"[{object}] created successfully."
-    elif type == "update":
-        print_with_format(f"[{object}] updated successfully.")
-        return f"[{object}] updated successfully."
-    elif type == "delete":
-        print_with_format(f"[{object}] deleted successfully.")
-        return f"[{object}] deleted successfully."
-    elif type == "get":
-        print
-        return f"[{object}] retrieved successfully."
-    elif type == "error":
-        print_with_format(f"Error processing the request for [{object}].", type="error")
-        return f"Error processing the request for [{object}]."
+    if object is None:
+        if type == "get":
+            print_with_format(f"Data retrieved successfully.")
+            return f"Data retrieved successfully."          
+        elif type == "error":
+            print_with_format(f"Error processing the request.", type="error")
+            return f"Error processing the request."
+        else:
+            print_with_format(f"Invalid operation.", type="error")
+            return f"Invalid operation."
     else:
-        print_with_format(f"Invalid operation for [{object}].", type="error")
-        return f"Invalid operation for [{object}]."
+        if type == "create":
+            print_with_format(f"[{object}] created successfully.")
+            return f"[{object}] created successfully."
+        elif type == "update":
+            print_with_format(f"[{object}] updated successfully.")
+            return f"[{object}] updated successfully."
+        elif type == "delete":
+            print_with_format(f"[{object}] deleted successfully.")
+            return f"[{object}] deleted successfully."
+        elif type == "get":
+            print_with_format(f"[{object}] retrieved successfully.") 
+            return f"[{object}] retrieved successfully."
+        elif type == "error":
+            print_with_format(f"Error processing the request for [{object}].", type="error")
+            return f"Error processing the request for [{object}]."
+        else:
+            print_with_format(f"Invalid operation for [{object}].", type="error")
+            return f"Invalid operation for [{object}]."
 
 def read_config_file(dir):
     try:
