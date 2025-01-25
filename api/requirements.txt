@@ -1,11 +1,10 @@
 Flask
 pymysql
 apiflask
-pandas
 python-dotenv
 sqlalchemy
 sqlalchemy_utils
 watchdog
 colorama
-cryptography
 flask_migrate
+#cryptography

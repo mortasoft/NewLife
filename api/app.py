@@ -35,7 +35,6 @@ Base = declarative_base()
 with app.app_context():  # Use app context
         Base.metadata.create_all(engine) # Create tables
 
-
 # --- Routes ---
 @app.route("/")
 @app.doc(hide=True)
@@ -45,8 +44,6 @@ def home():
 # Import and configure endpoints
 import goals.endpoints as goals_endpoints
 goals_endpoints.configure_endpoints(app, engine)
-
-
 
 
 # --- Run the app ---
