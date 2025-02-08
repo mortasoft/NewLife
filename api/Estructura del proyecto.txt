@@ -6,9 +6,13 @@ Inicio
 
 Tareas
  - Actividades Diarias
+ - Administración del tiempo
  - Tareas
 
-Metas
+Travels
+- Planeamiento
+
+Propositos del año
  - Metas
  - Objetivos
 
@@ -16,7 +20,17 @@ Cuentas
  - Dashboard
  - Cuentas
  - Transacciones
+ - Herramientas
+    - Calculadora de prestamos
+    - Calculadora de interes compuesto
+    - Cargar archivo con transacciones
  - Reportes
+
+ Salud 
+ - Control de peso
+
+Habitos
+- Habitos
 
 Diario / Hobbies.
  - Dashboard
