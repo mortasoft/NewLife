@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from sqlalchemy import create_engine, ForeignKey, String, Integer, Date, Column, Numeric, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Integer, Date, Column, Numeric, DateTime
-from database import Database
+from bak.database import Database
 import utils as app_utils
 
 BASE_NAME = "hobbies"
