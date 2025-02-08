@@ -4,7 +4,7 @@ from apiflask import Schema, HTTPError
 from apiflask import APIBlueprint, Schema, input, output
 from apiflask.fields import Integer as apiInteger, String as apiString, Date as apiDate, Decimal as apiDecimal
 from apiflask.validators import Length as apiLength, OneOf as apiOneOf, Range as apiRange
-from goals.goals import GoalManager, GoalSchema
+from goals.models import GoalManager, GoalSchema
 from sqlalchemy.exc import NoForeignKeysError, IntegrityError
 
 # Define the blueprint

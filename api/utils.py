@@ -6,15 +6,19 @@ import hashlib
 import logging
 from apiflask.fields import String, Integer, Field
 from apiflask import Schema
+from typing import Dict, Any
 from dotenv import load_dotenv
 load_dotenv()
 
-class Response:
-  def __init__(self, result, message, status_code, data=None):
-    self.result = result
-    self.message = message
-    self.status_code = status_code
-    self.data = data
+@staticmethod
+def create_response(result: Dict[str, Any]) -> tuple[Dict[str, Any], int]:
+    """Create a standardized response format."""
+    return {
+        'message': result['message'],
+        'status_code': result['status_code'],
+        'result': result['result'],
+        'data': result['data']
+    }, result['status_code']
 
 
 class BaseResponse(Schema):
@@ -23,11 +27,6 @@ class BaseResponse(Schema):
     status_code = Integer()
     data = Field()
     
-# ENUM for the result of the operation
-class ResultEnum:
-    OK = "ok"
-    ERROR = "error"
-    NOT_FOUND = "not_found"
 
 
 def generate_message(object, type):
@@ -38,6 +37,9 @@ def generate_message(object, type):
         elif type == "error":
             print_with_format(f"Error processing the request.", type="error")
             return f"Error processing the request."
+        elif type == "id_not_found":
+            print_with_format(f"The data with the specified ID does not exist.", type="error")
+            return f"The data with the specified ID does not exist."
         else:
             print_with_format(f"Invalid operation.", type="error")
             return f"Invalid operation."

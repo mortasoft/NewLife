@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from sqlalchemy import create_engine, ForeignKey, String, Integer, Date, Column, Numeric, DateTime, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import utils as app_utils
-from database import Database
+from bak.database import Database
 
 BASE_NAME = "health"
 
