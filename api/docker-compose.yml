@@ -1,7 +1,46 @@
+version: "3.9"  # Especifica la versión de docker-compose
+
 services:
-  newlife-api:
-    image: newlife-api:latest
+  web:
+    build: .  # Construye la imagen desde el Dockerfile en el directorio actual
     ports:
-      - "5100:5000"
-    env_file:
-      - .env
+      - "${API_PORT}:${API_PORT}"  # Mapea el puerto del contenedor al puerto del host
+    environment: # Define las variables de entorno
+      - ENVIRONMENT_TYPE=${ENVIRONMENT_TYPE}
+      - API_DEBUG=${API_DEBUG}
+      - API_HOST=${API_HOST}
+      - API_PORT=${API_PORT}
+      - API_TITLE=${API_TITLE}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DEV_DB_HOST=${DEV_DB_HOST}
+      - DEV_DB_USER=${DEV_DB_USER}
+      - DEV_DB_PASS=${DEV_DB_PASS}
+      - DEV_DB_PORT=${DEV_DB_PORT}
+      - DEV_DB_NAME=${DEV_DB_NAME}
+      - LOGGING_ENABLED=${LOGGING_ENABLED}
+      - VERSION=${VERSION}
+      - SECRET_KEY=${SECRET_KEY}
+    depends_on: # Indica que el servicio web depende del servicio de la base de datos
+      - db
+    volumes:
+      -./app.log:/app/app.log # Persiste los logs
+    restart: always # Reinicia el contenedor en caso de error
+
+  db:
+    image: mysql:8.0  # Usa la imagen de MySQL 8.0 (puedes cambiarla a la versión que necesites)
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD} # Contraseña de root (¡IMPORTANTE: solo para desarrollo!)
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_DATABASE=${DB_NAME}
+    ports:
+      - "3306:3306" # Mapea el puerto de MySQL (solo para desarrollo)
+    volumes:
+      - db_data:/var/lib/mysql # Persiste los datos de la base de datos
+
+volumes:
+  db_data: # Volumen para los datos de la base de datos

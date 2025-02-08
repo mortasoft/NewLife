@@ -7,12 +7,14 @@ WORKDIR /app
 COPY app/requirements.txt .
 
 # Install the dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application
 COPY app/ .
 
-CMD ["python", "main.py"]
+EXPOSE ${API_PORT}
+
+CMD gunicorn --bind 0.0.0.0:${API_PORT} --workers 1 --threads 4 app:flask_app.app
 
 
 # Para generar la imagen
