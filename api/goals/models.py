@@ -174,7 +174,7 @@ class GoalManager:
                 'data': result,
                 'message': app_utils.generate_message("Goal", 'create'),
                 'result': 'ok',
-                'status_code': 200
+                'status_code': 201
             }
         except Exception as e:
             logger.error(f"Error adding goal: {str(e)}")

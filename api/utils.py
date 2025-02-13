@@ -30,17 +30,22 @@ class BaseResponse(Schema):
 
 
 def generate_message(obj: Optional[Any], type: str) -> str:
-    messages = {
-        (None, "get"): "Data retrieved successfully.",
-        (None, "error"): "Error processing the request.",
-        (None, "id_not_found"): "The data with the specified ID does not exist.",
-        (Any, "create"): f"[{obj}] created successfully.",
-        (Any, "update"): f"[{obj}] updated successfully.",
-        (Any, "delete"): f"[{obj}] deleted successfully.",
-        (Any, "get"): f"[{obj}] retrieved successfully.",
-        (Any, "error"): f"Error processing the request for [{obj}].",
-    }
-    return messages.get((obj, type), "Invalid operation.")
+    if obj is None:
+        messages = {
+            "get": "Data retrieved successfully.",
+            "error": "Error processing the request.",
+            "id_not_found": "The data with the specified ID does not exist."
+        }
+        return messages.get(type, "Invalid operation.")
+    else:
+        messages = {
+            "create": f"[{obj}] created successfully.",
+            "update": f"[{obj}] updated successfully.",
+            "delete": f"[{obj}] deleted successfully.",
+            "get": f"[{obj}] retrieved successfully.",
+            "error": f"Error processing the request for [{obj}]."
+        }
+        return messages.get(type, "Invalid operation.")
 
 def read_config_file(dir):
     try:
