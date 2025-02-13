@@ -30,7 +30,7 @@ class LifeApp_API:
         """Create and configure the Flask application instance."""
         app = APIFlask(
             __name__,
-            title=f"{self.config.API_TITLE} | {self.config.ENVIRONMENT_TYPE}",
+            title=f"{self.config.API_TITLE} | {self.config.ENVIRONMENT_TYPE} | Version: {self.config.VERSION}",
             version=self.config.VERSION
         )
         

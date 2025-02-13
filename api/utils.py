@@ -16,13 +16,11 @@ def create_response(result: Dict[str, Any]) -> tuple[Dict[str, Any], int]:
     return {
         'message': result['message'],
         'status_code': result['status_code'],
-        'result': result['result'],
         'data': result['data']
     }, result['status_code']
 
 
 class BaseResponse(Schema):
-    result = String()
     message = String()
     status_code = Integer()
     data = Field()
