@@ -224,7 +224,7 @@ class GoalManager:
                 
             return {
                 'data': result,
-                'message': app_utils.generate_message(goal, 'get'),
+                'message': app_utils.generate_message(None, 'get'),
                 'result': 'ok',
                 'status_code': 200
             }
