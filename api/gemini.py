@@ -1,8 +1,11 @@
 import requests
 import json
 
+from utils import load_env_vars
+config = load_env_vars()
+
 # The URL for the Gemini API (API_KEY should be set externally or passed as an argument)
-API_KEY = "AIzaSyAfttlKbqSn8Q6mylOd-6nMzxLp5Leb9XY"  # ***REPLACE WITH YOUR ACTUAL API KEY***
+API_KEY = config.GEMINI_API_KEY
 API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
 
 def generate_content(model="gemini-1.5-flash", prompt="Explain how AI works"):

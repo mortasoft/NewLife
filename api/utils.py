@@ -120,7 +120,9 @@ def create_env_file(file_path=".env"):
                 "DEV_DB_PASS": "password",
                 "DEV_DB_PORT": "3306",
                 "DEV_DB_NAME": "newlife",
-                "LOGGING_ENABLED": "True"
+                "LOGGING_ENABLED": "True",
+                "GEMINI_API_KEY": "1234567890",
+                "OPENAI_API_KEY": "1234567890",
                 }
         
         with open(file_path, "w") as f:
@@ -199,6 +201,8 @@ class Config:
         self.DEV_DB_PASS = os.getenv("DEV_DB_PASS")
         self.DEV_DB_PORT = os.getenv("DEV_DB_PORT")
         self.DEV_DB_NAME = os.getenv("DB_HOST_DEV")
+        self.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         
         if self.ENVIRONMENT_TYPE == "development":
             self.SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{self.DEV_DB_USER}:{self.DEV_DB_PASS}@{self.DEV_DB_HOST}:{self.DEV_DB_PORT}/{self.DEV_DB_NAME}"
