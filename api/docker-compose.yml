@@ -1,6 +1,7 @@
 services:
   api:
     build: .
+    image: newlife-api:latest
     container_name: newlife-api
     ports:
       - "${API_PORT}:${API_PORT}"
