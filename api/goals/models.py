@@ -19,10 +19,10 @@ Base = declarative_base()
 BASE_NAME = "goals"
 
 class GoalStatus(Enum):
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
+    PENDING = "Pending"
+    IN_PROGRESS = "In progress"
+    COMPLETED = "Completed"
+    CANCELLED = "Cancelled"
     
 @dataclass
 class ModelConfig:
@@ -157,14 +157,15 @@ class GoalManager:
             logger.error(f"Error creating database tables: {str(e)}")
             raise
     
-    def add_goal(self, name: str, description: str, date: Date) -> Dict[str, Any]:
+    def add_goal(self, name: str, description: str, date: Date, status: str) -> Dict[str, Any]:
         """Add a new goal to the database."""
         try:
             with self.session_scope() as session:
                 new_goal = GoalModel(
                     name=name,
                     description=description,
-                    date=date
+                    date=date,
+                    status=status
                 )
                 session.add(new_goal)
                 session.flush()
@@ -174,7 +175,7 @@ class GoalManager:
                 'data': result,
                 'message': app_utils.generate_message("Goal", 'create'),
                 'result': 'ok',
-                'status_code': 200
+                'status_code': 201
             }
         except Exception as e:
             logger.error(f"Error adding goal: {str(e)}")
@@ -224,7 +225,7 @@ class GoalManager:
                 
             return {
                 'data': result,
-                'message': app_utils.generate_message(goal, 'get'),
+                'message': app_utils.generate_message(None, 'get'),
                 'result': 'ok',
                 'status_code': 200
             }
@@ -278,7 +279,7 @@ class GoalManager:
                 
             return {
                 'data': result,
-                'message': app_utils.generate_message(result, 'create'),
+                'message': app_utils.generate_message("Objective", 'create'),
                 'result': 'ok',
                 'status_code': 200
             }

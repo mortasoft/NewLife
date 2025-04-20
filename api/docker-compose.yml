@@ -1,7 +1,28 @@
 services:
-  newlife-api:
-    image: newlife-api:latest
+  api:
+    build: .
+    container_name: newlife-api
     ports:
-      - "5100:5000"
+      - "${API_PORT}:${API_PORT}"
     env_file:
-      - .env
+      - .env  # Carga las variables de entorno desde .env
+    depends_on:
+      - db
+    volumes:
+      - ./app.log:/app/app.log  # Persistencia de logs
+    restart: always
+
+  db:
+    image: mysql:8.0
+    container_name: newlife-api-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS} 
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3306:3306" # MYSQL_PORT
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

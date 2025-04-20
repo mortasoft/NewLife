@@ -6,7 +6,7 @@ import hashlib
 import logging
 from apiflask.fields import String, Integer, Field
 from apiflask import Schema
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -16,52 +16,34 @@ def create_response(result: Dict[str, Any]) -> tuple[Dict[str, Any], int]:
     return {
         'message': result['message'],
         'status_code': result['status_code'],
-        'result': result['result'],
         'data': result['data']
     }, result['status_code']
 
 
 class BaseResponse(Schema):
-    result = String()
     message = String()
     status_code = Integer()
     data = Field()
     
 
 
-def generate_message(object, type):
-    if object is None:
-        if type == "get":
-            print_with_format(f"Data retrieved successfully.")
-            return f"Data retrieved successfully."          
-        elif type == "error":
-            print_with_format(f"Error processing the request.", type="error")
-            return f"Error processing the request."
-        elif type == "id_not_found":
-            print_with_format(f"The data with the specified ID does not exist.", type="error")
-            return f"The data with the specified ID does not exist."
-        else:
-            print_with_format(f"Invalid operation.", type="error")
-            return f"Invalid operation."
+def generate_message(obj: Optional[Any], type: str) -> str:
+    if obj is None:
+        messages = {
+            "get": "Data retrieved successfully.",
+            "error": "Error processing the request.",
+            "id_not_found": "The data with the specified ID does not exist."
+        }
+        return messages.get(type, "Invalid operation.")
     else:
-        if type == "create":
-            print_with_format(f"[{object}] created successfully.")
-            return f"[{object}] created successfully."
-        elif type == "update":
-            print_with_format(f"[{object}] updated successfully.")
-            return f"[{object}] updated successfully."
-        elif type == "delete":
-            print_with_format(f"[{object}] deleted successfully.")
-            return f"[{object}] deleted successfully."
-        elif type == "get":
-            print_with_format(f"[{object}] retrieved successfully.") 
-            return f"[{object}] retrieved successfully."
-        elif type == "error":
-            print_with_format(f"Error processing the request for [{object}].", type="error")
-            return f"Error processing the request for [{object}]."
-        else:
-            print_with_format(f"Invalid operation for [{object}].", type="error")
-            return f"Invalid operation for [{object}]."
+        messages = {
+            "create": f"[{obj}] created successfully.",
+            "update": f"[{obj}] updated successfully.",
+            "delete": f"[{obj}] deleted successfully.",
+            "get": f"[{obj}] retrieved successfully.",
+            "error": f"Error processing the request for [{obj}]."
+        }
+        return messages.get(type, "Invalid operation.")
 
 def read_config_file(dir):
     try:
@@ -74,37 +56,28 @@ def read_config_file(dir):
         sys.exit()
 
 
-def print_with_format(text, type="message"):
-    """
-    Prints a message with a specific format.
-    type can be:
-        - m: message
-        - w: warning
-        - e: error
-    """
-    
+def _print_formatted(text: str, type: str = "message") -> None: # Función interna para imprimir
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
-    if os.getenv("API_DEBUG") and os.getenv("API_DEBUG").lower() == "true":
-        if type=="message":
-            formatted_text = f"[{Fore.GREEN}{date}{Style.RESET_ALL}] | {text}"
-        elif type=="warning":
-            formatted_text = f"[{Fore.YELLOW}{date}{Style.RESET_ALL}] | {text}"
-        elif type=="error":
-            formatted_text = f"[{Fore.RED}{date}{Style.RESET_ALL}] | {text}"
-        print(formatted_text)
-    else:
-        formatted_text = f"[{Fore.RED}{date}{Style.RESET_ALL}] | {text}"
-        print(formatted_text)
+    color = {
+        "message": Fore.GREEN,
+        "warning": Fore.YELLOW,
+        "error": Fore.RED,
+    }.get(type, Fore.RED)  # Color por defecto: rojo
 
-    # Configure logging
+    formatted_text = f"[{color}{date}{Style.RESET_ALL}] | {text}"
+    print(formatted_text)
+
+
+def _log_message(text: str) -> None: # Función interna para logging
+    logging.info(text)
+
+def print_with_format(text: str, type: str = "message") -> None:
+    _print_formatted(text, type)
     if os.getenv("LOGGING_ENABLED") and os.getenv("LOGGING_ENABLED").lower() == "true":
-        logging.basicConfig(filename='app.log', level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s')
-        logging.info(formatted_text)  # Guarda el mensaje formateado en el log
+        _log_message(text)
     
         
-def generate_uuid():
+def generate_uuid() -> str:
     """
     Generates a UUID.
 
@@ -114,7 +87,7 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 
-def generate_hash(text):
+def generate_hash(text: str) -> str:
     """
     Generates a hash from a text.
 
@@ -147,7 +120,9 @@ def create_env_file(file_path=".env"):
                 "DEV_DB_PASS": "password",
                 "DEV_DB_PORT": "3306",
                 "DEV_DB_NAME": "newlife",
-                "LOGGING_ENABLED": "True"
+                "LOGGING_ENABLED": "True",
+                "GEMINI_API_KEY": "1234567890",
+                "OPENAI_API_KEY": "1234567890",
                 }
         
         with open(file_path, "w") as f:
@@ -226,6 +201,8 @@ class Config:
         self.DEV_DB_PASS = os.getenv("DEV_DB_PASS")
         self.DEV_DB_PORT = os.getenv("DEV_DB_PORT")
         self.DEV_DB_NAME = os.getenv("DB_HOST_DEV")
+        self.GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+        self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
         
         if self.ENVIRONMENT_TYPE == "development":
             self.SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{self.DEV_DB_USER}:{self.DEV_DB_PASS}@{self.DEV_DB_HOST}:{self.DEV_DB_PORT}/{self.DEV_DB_NAME}"
