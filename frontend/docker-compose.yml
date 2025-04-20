@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    container_name: newlife-frontend
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    env_file:
+      - .env  # Carga las variables de entorno desde .env
+    volumes:
+      - ./app.log:/app/app.log  # Persistencia de logs
+    restart: always
+    
