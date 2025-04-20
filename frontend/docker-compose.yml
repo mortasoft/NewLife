@@ -1,6 +1,7 @@
 services:
   app:
     build: .
+    image: newlife-frontend:latest
     container_name: newlife-frontend
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
