@@ -41,6 +41,7 @@ def generate_message(obj: Optional[Any], type: str) -> str:
             "update": f"[{obj}] updated successfully.",
             "delete": f"[{obj}] deleted successfully.",
             "get": f"[{obj}] retrieved successfully.",
+            "request": f"[{obj}] requested successfully.",
             "error": f"Error processing the request for [{obj}]."
         }
         return messages.get(type, "Invalid operation.")

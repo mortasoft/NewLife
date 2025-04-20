@@ -64,6 +64,9 @@ class LifeApp_API:
         # Import endpoints here to avoid circular imports
         import goals.endpoints as goals_endpoints
         goals_endpoints.configure_endpoints(self.app, self.engine)
+        
+        import IA.endpoints as IA_endpoints
+        IA_endpoints.configure_endpoints(self.app, self.engine)
     
     def run(self):
         """Run the Flask application."""
