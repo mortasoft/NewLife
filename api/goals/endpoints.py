@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, List
 from http import HTTPStatus
 from datetime import date
 import utils as app_utils
@@ -7,7 +7,9 @@ from apiflask.fields import (
     Integer as ApiInteger,
     String as ApiString,
     Date as ApiDate,
-    Decimal as ApiDecimal
+    Decimal as ApiDecimal,
+    List as ApiList,
+    Nested as ApiNested
 )
 from apiflask.validators import (
     Length as ApiLength,
@@ -15,6 +17,7 @@ from apiflask.validators import (
     Range as ApiRange
 )
 from goals.models import GoalManager
+from goals.models import GoalStatus
 
 # Constants
 CURRENCY_CHOICES = ["USD", "CRC", "EUR"]
@@ -28,33 +31,8 @@ class BaseSchema(Schema):
     @staticmethod
     def generate_example_id() -> str:
         return "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+    
 
-class GoalSchema(BaseSchema):
-    """Schema for goal creation requests."""
-    name = ApiString(
-        required=True,
-        validate=ApiLength(max=MAX_STRING_LENGTH),
-        example="My 2025 Savings Goal"
-    )
-    description = ApiString(
-        required=True,
-        validate=ApiLength(max=MAX_DESCRIPTION_LENGTH),
-        example="Save money for a down payment"
-    )
-    date = ApiDate(
-        required=True,
-        example=date.today().isoformat()
-    )
-    
-class GoalSchemaOut(GoalSchema):
-    """Schema for goal responses, extends GoalSchema with ID."""
-    id = ApiString(
-        required=False,
-        validate=ApiLength(max=MAX_UUID_LENGTH),
-        example=BaseSchema.generate_example_id()
-    )
-    
-    
 class ObjectiveSchema(BaseSchema):
     """Schema for objective creation and responses."""
     name = ApiString(
@@ -103,6 +81,42 @@ class ObjectiveSchema(BaseSchema):
         example=BaseSchema.generate_example_id()
     )
 
+class GoalSchema(BaseSchema):
+    """Schema for goal creation requests."""
+    name = ApiString(
+        required=True,
+        validate=ApiLength(max=MAX_STRING_LENGTH),
+        example="My 2025 Savings Goal"
+    )
+    description = ApiString(
+        required=True,
+        validate=ApiLength(max=MAX_DESCRIPTION_LENGTH),
+        example="Save money for a down payment"
+    )
+    date = ApiDate(
+        required=True,
+        example=date.today().isoformat()
+    )
+    status = ApiString(
+        required=False,
+        validate=ApiOneOf([miembro.value for miembro in GoalStatus]),
+        example="Pending"
+    )
+    
+    objectives = ApiList(ApiNested(ObjectiveSchema)) 
+    
+    
+class GoalSchemaOut(GoalSchema):
+    """Schema for goal responses, extends GoalSchema with ID."""
+    id = ApiString(
+        required=False,
+        validate=ApiLength(max=MAX_UUID_LENGTH),
+        example=BaseSchema.generate_example_id()
+    )
+    
+    
+
+
 class EndpointManager:
     """Manages API endpoints and their configuration."""
     
@@ -141,7 +155,6 @@ class EndpointManager:
         """Configure all API endpoints."""
         self._setup_goal_endpoints()
         self._setup_objective_endpoints()
-        self._setup_utility_endpoints()
 
     def _setup_goal_endpoints(self):
         """Configure goal-related endpoints."""
@@ -194,18 +207,6 @@ class EndpointManager:
             app_utils.print_with_format(f"[GOAL-ENDPOINT] Adding objective: {json_data}")
             result = self.goal_manager.add_objective(**json_data)
             return app_utils.create_response(result)
-
-    def _setup_utility_endpoints(self):
-        """Configure utility endpoints."""
-        
-        @self.app.get('/hello')
-        def say_hello():
-            return app_utils.create_response({
-                'data': {'message': 'Hello!'},
-                'message': 'Success!',
-                'status_code': HTTPStatus.OK
-            })
-
 
 def configure_endpoints(app, engine):
     """Entry point for endpoint configuration."""
