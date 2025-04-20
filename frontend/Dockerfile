@@ -37,9 +37,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # The . represents the current directory on the host machine, and the second . represents the current directory in the container (which is /app)
 COPY . .
 
-# Expose port 8000 for the FastAPI application
-# This allows the application to be accessible from outside the container on port 8000
-EXPOSE 8000
+# Expose port 5000 for the Flask application
+# The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime
+EXPOSE 5000
 
 # The CMD instruction specifies the command to run when the container starts
 # In this case, it runs the FastAPI application using uvicorn
