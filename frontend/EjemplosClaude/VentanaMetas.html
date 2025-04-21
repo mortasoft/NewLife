@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicación de Metas</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .goal-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .goal-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .progress {
+            height: 10px;
+        }
+        
+        .currency {
+            font-weight: bold;
+            color: #198754;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <header class="bg-primary text-white p-4 rounded shadow-sm mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 mb-0">Mis Metas</h1>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newGoalModal">
+                    <i class="bi bi-plus-circle me-2"></i>Nueva Meta
+                </button>
+            </div>
+        </header>
+        
+        <!-- Filtros -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="status-filter" class="form-label">Estado:</label>
+                        <select id="status-filter" class="form-select">
+                            <option value="all">Todas</option>
+                            <option value="active">Activas</option>
+                            <option value="completed">Completadas</option>
+                            <option value="pending">Pendientes</option>
+                            <option value="cancelled">Canceladas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="date-filter" class="form-label">Fecha:</label>
+                        <input type="date" id="date-filter" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="search" class="form-label">Buscar:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" id="search" class="form-control" placeholder="Buscar metas...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contenedor de Metas -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <!-- Meta 1 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm goal-card">
+                    <div class="card-header bg-primary text-white position-relative">
+                        <h5 class="card-title mb-0">Perder Peso</h5>
+                        <p class="card-text mb-0 small">Fecha: 31/12/2025</p>
+                        <span class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-success">
+                            Activa
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Mejorar mi salud y condición física bajando de peso progresivamente durante todo el año.</p>
+                        
+                        <h6 class="border-bottom pb-2 mb-3">Objetivos</h6>
+                        <div class="objectives-list">
+                            <!-- Objetivo numérico -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Bajar de Peso</h6>
+                                    <p class="card-text small">Reducir mi peso de forma saludable.</p>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>80kg</span>
+                                            <span>70kg</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 40%" 
+                                                aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span>Progreso: 76kg</span>
+                                            <span>40%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Objetivo booleano -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Registro Diario</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="daily-log" checked>
+                                        <label class="form-check-label" for="daily-log">
+                                            Mantener un registro diario de alimentación
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meta 2 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm goal-card">
+                    <div class="card-header bg-primary text-white position-relative">
+                        <h5 class="card-title mb-0">Ahorrar para Vacaciones</h5>
+                        <p class="card-text mb-0 small">Fecha: 15/08/2025</p>
+                        <span class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-warning text-dark">
+                            Pendiente
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Ahorrar suficiente dinero para unas vacaciones de verano con mi familia.</p>
+                        
+                        <h6 class="border-bottom pb-2 mb-3">Objetivos</h6>
+                        <div class="objectives-list">
+                            <!-- Objetivo monetario -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Fondo de Vacaciones</h6>
+                                    <p class="card-text small">Ahorrar dinero mensualmente para el viaje.</p>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span><span class="currency">$</span>0</span>
+                                            <span><span class="currency">$</span>2,500</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 60%" 
+                                                aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span>Ahorrado: <span class="currency">$</span>1,500</span>
+                                            <span>60%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Objetivo booleano -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Reservar Alojamiento</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="book-hotel">
+                                        <label class="form-check-label" for="book-hotel">
+                                            Reservar hotel con anticipación
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meta 3 -->
+            <div class="col">
+                <div class="card h-100 shadow-sm goal-card">
+                    <div class="card-header bg-primary text-white position-relative">
+                        <h5 class="card-title mb-0">Aprender Programación</h5>
+                        <p class="card-text mb-0 small">Fecha: 01/10/2025</p>
+                        <span class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-success">
+                            Activa
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Dominar los fundamentos de programación y crear proyectos personales.</p>
+                        
+                        <h6 class="border-bottom pb-2 mb-3">Objetivos</h6>
+                        <div class="objectives-list">
+                            <!-- Objetivo numérico -->
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Completar Cursos</h6>
+                                    <p class="card-text small">Finalizar cursos online de programación.</p>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>0 cursos</span>
+                                            <span>5 cursos</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 60%" 
+                                                aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span>Completados: 3 cursos</span>
+                                            <span>60%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Objetivo booleano -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Proyecto Personal</h6>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="personal-project">
+                                        <label class="form-check-label" for="personal-project">
+                                            Crear una aplicación propia
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meta 4 (completa) -->
+            <div class="col">
+                <div class="card h-100 shadow-sm goal-card">
+                    <div class="card-header bg-primary text-white position-relative">
+                        <h5 class="card-title mb-0">Leer más libros</h5>
+                        <p class="card-text mb-0 small">Fecha: 31/03/2025</p>
+                        <span class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-info">
+                            Completada
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Cultivar el hábito de la lectura y ampliar mis conocimientos.</p>
+                        
+                        <h6 class="border-bottom pb-2 mb-3">Objetivos</h6>
+                        <div class="objectives-list">
+                            <!-- Objetivo numérico -->
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Libros Leídos</h6>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between small text-muted mb-1">
+                                            <span>0 libros</span>
+                                            <span>12 libros</span>
+                                        </div>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 100%" 
+                                                aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small">
+                                            <span>Leídos: 12 libros</span>
+                                            <span>100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-sm btn-outline-primary me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para Nueva Meta -->
+    <div class="modal fade" id="newGoalModal" tabindex="-1" aria-labelledby="newGoalModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="newGoalModalLabel">Nueva Meta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="goal-name" class="form-label">Nombre de la Meta</label>
+                            <input type="text" class="form-control" id="goal-name" placeholder="Ej. Correr un maratón">
+                        </div>
+                        <div class="mb-3">
+                            <label for="goal-description" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="goal-description" rows="3" placeholder="Describe tu meta..."></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="goal-date" class="form-label">Fecha Límite</label>
+                                <input type="date" class="form-control" id="goal-date">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="goal-status" class="form-label">Estado</label>
+                                <select class="form-select" id="goal-status">
+                                    <option value="active">Activa</option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="completed">Completada</option>
+                                    <option value="cancelled">Cancelada</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4 mb-3">Objetivos</h6>
+                        <div id="objectives-container">
+                            <!-- Plantilla para un objetivo -->
+                            <div class="objective-item card mb-3">
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-8">
+                                            <label for="objective-name-1" class="form-label">Nombre del Objetivo</label>
+                                            <input type="text" class="form-control" id="objective-name-1">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="objective-type-1" class="form-label">Tipo de Objetivo</label>
+                                            <select class="form-select objective-type" id="objective-type-1">
+                                                <option value="numeric">Numérico</option>
+                                                <option value="boolean">Booleano</option>
+                                                <option value="monetary">Monetario</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="objective-description-1" class="form-label">Descripción</label>
+                                        <textarea class="form-control" id="objective-description-1" rows="2"></textarea>
+                                    </div>
+                                    
+                                    <!-- Campos para objetivo numérico (visible por defecto) -->
+                                    <div class="numeric-fields">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="start-number-1" class="form-label">Número Inicial</label>
+                                                <input type="number" class="form-control" id="start-number-1">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="end-number-1" class="form-label">Número Final</label>
+                                                <input type="number" class="form-control" id="end-number-1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos para objetivo monetario (oculto inicialmente) -->
+                                    <div class="monetary-fields d-none">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <label for="start-value-1" class="form-label">Valor Inicial</label>
+                                                <input type="number" class="form-control" id="start-value-1">
+                                            </div>
+                                            <div class="col-md-5">
+                                                <label for="end-value-1" class="form-label">Valor Final</label>
+                                                <input type="number" class="form-control" id="end-value-1">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <label for="currency-unit-1" class="form-label">Moneda</label>
+                                                <select class="form-select" id="currency-unit-1">
+                                                    <option value="USD">USD</option>
+                                                    <option value="EUR">EUR</option>
+                                                    <option value="MXN">MXN</option>
+                                                    <option value="COP">COP</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Campos para objetivo booleano (oculto inicialmente) -->
+                                    <div class="boolean-fields d-none">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="is-boolean-1">
+                                            <label class="form-check-label" for="is-boolean-1">Marcar como completado</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-objective">
+                                        <i class="bi bi-trash"></i> Eliminar Objetivo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" id="add-objective">
+                            <i class="bi bi-plus-circle"></i> Añadir Objetivo
+                        </button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Guardar Meta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle con Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animación para las barras de progreso
+            const progressBars = document.querySelectorAll('.progress-bar');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // Cambio de tipo de objetivo en el formulario
+            document.querySelectorAll('.objective-type').forEach(select => {
+                select.addEventListener('change', function() {
+                    const parent = this.closest('.objective-item');
+                    const numericFields = parent.querySelector('.numeric-fields');
+                    const monetaryFields = parent.querySelector('.monetary-fields');
+                    const booleanFields = parent.querySelector('.boolean-fields');
+                    
+                    // Ocultar todos
+                    numericFields.classList.add('d-none');
+                    monetaryFields.classList.add('d-none');
+                    booleanFields.classList.add('d-none');
+                    
+                    // Mostrar el seleccionado
+                    if (this.value === 'numeric') {
+                        numericFields.classList.remove('d-none');
+                    } else if (this.value === 'monetary') {
+                        monetaryFields.classList.remove('d-none');
+                    } else if (this.value === 'boolean') {
+                        booleanFields.classList.remove('d-none');
+                    }
+                });
+            });
+            
+            // Botón para añadir un nuevo objetivo
+            document.getElementById('add-objective').addEventListener('click', function() {
+                const objectivesContainer = document.getElementById('objectives-container');
+                const objectiveTemplate = objectivesContainer.querySelector('.objective-item').cloneNode(true);
+                
+                // Limpiar los campos del clon
+                objectiveTemplate.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+                    input.value = '';
+                });
+                
+                objectiveTemplate.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Actualizar IDs y atributos para evitar duplicados
+                const objectiveCount = objectivesContainer.querySelectorAll('.objective-item').length + 1;
+                objectiveTemplate.querySelectorAll('[id]').forEach(element => {
+                    const currentId = element.id;
+                    const baseName = currentId.substring(0, currentId.lastIndexOf('-') + 1);
+                    element.id = baseName + objectiveCount;
+                });
+                
+                objectiveTemplate.querySelectorAll('label').forEach(label => {
+                    if (label.getAttribute('for')) {
+                        const currentFor = label.getAttribute('for');
+                        const baseName = currentFor.substring(0, currentFor.lastIndexOf('-') + 1);
+                        label.setAttribute('for', baseName + objectiveCount);
+                    }
+                });
+                
+                // Reiniciar la visibilidad de los campos
+                objectiveTemplate.querySelector('.numeric-fields').classList.remove('d-none');
+                objectiveTemplate.querySelector('.monetary-fields').classList.add('d-none');
+                objectiveTemplate.querySelector('.boolean-fields').classList.add('d-none');
+                
+                // Configurar evento para el botón de eliminar
+                objectiveTemplate.querySelector('.remove-objective').addEventListener('click', function() {
+                    if (objectivesContainer.querySelectorAll('.objective-item').length > 1) {
+                        this.closest('.objective-item').remove();
+                    } else {
+                        alert('Debe haber al menos un objetivo.');
+                    }
+                });
+                
+                // Configurar evento para el select de tipo
+                objectiveTemplate.querySelector('.objective-type').addEventListener('change', function() {
+                    const parent = this.closest('.objective-item');
+                    const numericFields = parent.querySelector('.numeric-fields');
+                    const monetaryFields = parent.querySelector('.monetary-fields');
+                    const booleanFields = parent.querySelector('.boolean-fields');
+                    
+                    // Ocultar todos
+                    numericFields.classList.add('d-none');
+                    monetaryFields.classList.add('d-none');
+                    booleanFields.classList.add('d-none');
+                    
+                    // Mostrar el seleccionado
+                    if (this.value === 'numeric') {
+                        numericFields.classList.remove('d-none');
+                    } else if (this.value === 'monetary') {
+                        monetaryFields.classList.remove('d-none');
+                    } else if (this.value === 'boolean') {
+                        booleanFields.classList.remove('d-none');
+                    }
+                });
+                
+                // Añadir el nuevo objetivo al contenedor
+                objectivesContainer.appendChild(objectiveTemplate);
+            });
+            
+            // Configurar el evento inicial para el botón de eliminar objetivo
+            document.querySelectorAll('.remove-objective').forEach(button => {
+                button.addEventListener('click', function() {
+                    const objectivesContainer = document.getElementById('objectives-container');
+                    if (objectivesContainer.querySelectorAll('.objective-item').length > 1) {
+                        this.closest('.objective-item').remove();
+                    } else {
+                        alert('Debe haber al menos un objetivo.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

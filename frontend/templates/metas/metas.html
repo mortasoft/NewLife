@@ -1,0 +1,509 @@
+{% extends "template.html" %}
+{% block titulo %}
+{{configs.title}}
+{% endblock %}
+
+{% block titulo_pagina %}
+{{configs.title}}
+{% endblock %}
+
+{% block style %}
+<style>
+    .goal-card {
+        transition: transform 0.3s ease;
+    }
+
+    .goal-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .progress {
+        height: 10px;
+    }
+
+    .currency {
+        font-weight: bold;
+        color: #198754;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    .floating-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+
+    .floating-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn-close-objective {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        opacity: 0.5;
+        transition: opacity 0.3s;
+    }
+
+    .btn-close-objective:hover {
+        opacity: 1;
+    }
+
+    .modal-dialog {
+        max-width: 700px;
+    }
+
+    .animate-in {
+        animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+
+
+            <!-- Buscador de metas -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="status-filter" class="form-label">Estado:</label>
+                            <select id="status-filter" class="form-select">
+                                <option value="all">Todas</option>
+                                <option value="active">Activas</option>
+                                <option value="completed">Completadas</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="cancelled">Canceladas</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date-filter" class="form-label">Fecha Desde:</label>
+                            <input type="date" id="date-filter" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="date-filter" class="form-label">Fecha Hasta:</label>
+                            <input type="date" id="date-filter" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="search" class="form-label">Buscar:</label>
+                            <div class="button-group">
+                                <button type="button" class="btn btn-primary" id="search-button"
+                                    disabled>Buscar</button>
+                                <button type="button" class="btn btn-secondary" id="clear-button"
+                                    disabled>Limpiar</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="button-group">
+                                <button type="button" class="btn btn-success" id="search-button" data-bs-toggle="modal" data-bs-target="#crearMetaModal">Crear nueva
+                                    meta</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor de Metas -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for meta in configs.data.data %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm goal-card">
+                        <div class="card-header bg-primary text-white position-relative">
+                            <h5 class=" mb-0">{{meta.name}}</h5>
+                            <p class="card-text mb-0 small">Fecha: {{meta.date}}</p>
+
+                            {% if meta.status == 'active' %}
+                            Activa
+                            {% elif meta.status == 'completed' %}
+                            <span
+                                class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-success rounded-pill">
+                                Completada
+                            </span>
+                            {% elif meta.status == 'Pending' %}
+                            <span
+                                class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-info rounded-pill">
+                                Pendiente
+                            </span>
+                            {% else %}
+                            <span
+                                class="position-absolute top-0 end-0 translate-middle-y mt-3 me-3 badge bg-danger rounded-pill">
+                                Cancelada
+                            </span>
+                            {% endif %}
+
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <p class="card-text">{{meta.description}}</p>
+
+                            <h6 class="border-bottom pb-2 mb-3">Objetivos:</h6>
+                            <div class="objectives-list">
+                                {% for objective in meta.objectives %}
+                                <!-- Si estos dos numeros son distintos de 0 es porque es una meta de valores de dinero -->
+                                {% if objective.start_value != None and objective.end_value != None %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="">{{objective.name}}</h6>
+                                        <p class="card-text small">{{objective.description}}</p>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                                <span>{{objective.currency_unit}}{{objective.start_value|int}}</span>
+                                                <span>{{objective.currency_unit}}{{objective.end_value|int}}</span>
+                                            </div>
+                                            {% set cumplimiento = (objective.start_value|int / objective.end_value|int)
+                                            * 100 %}
+                                            {% if cumplimiento >= 80 %}
+                                            {% set color = 'bg-success' %}
+                                            {% else %}
+                                            {% if cumplimiento >= 40 %}
+                                            {% set color = 'bg-warning' %}
+                                            {% else %}
+                                            {% set color = 'bg-danger' %}
+                                            {% endif %}
+                                            {% endif %}
+
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar {{color}}" role="progressbar"
+                                                    style="width: {{cumplimiento|int}}%" aria-valuenow="40"
+                                                    aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between small">
+                                                <span>Progreso: </span>
+                                                <span>{{cumplimiento|int}}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Si estos dos numeros son distintos de 0 es porque es una meta numerica -->
+                                {% if objective.start_number != None and objective.end_number != None %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6 class="">{{objective.name}}</h6>
+                                        <p class="card-text small">{{objective.description}}</p>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                                <span>{{objective.start_number|int}}{{objective.currency_unit}}</span>
+                                                <span>{{objective.end_number|int}}{{objective.currency_unit}}</span>
+                                            </div>
+
+                                            {% if objective.start_number > objective.end_number %}
+                                            {% set cumplimiento = ((objective.end_number|int /
+                                            objective.start_number|int))/1.5 * 100 %}
+                                            {% else %}
+                                            {% set cumplimiento = (objective.start_number|int /
+                                            objective.end_number|int) * 100 %}
+                                            {% endif %}
+
+                                            {% if cumplimiento >= 80 %}
+                                            {% set color = 'bg-success' %}
+                                            {% else %}
+                                            {% if cumplimiento >= 40 %}
+                                            {% set color = 'bg-warning' %}
+                                            {% else %}
+                                            {% set color = 'bg-danger' %}
+                                            {% endif %}
+                                            {% endif %}
+
+                                            <div class="progress mb-2">
+                                                <div class="progress-bar {{color}}" role="progressbar"
+                                                    style="width: {{cumplimiento|int}}%" aria-valuenow="40"
+                                                    aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between small">
+                                                <span>Progreso: </span>
+                                                <span>{{cumplimiento|int}}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Ahora si es de tipo booleano -->
+                                {% if objective.is_boolean == 1 %}
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <p class="card-text">Obtener la certificación en desarrollo web avanzado para
+                                            mejorar mis oportunidades profesionales.</p>
+                                        <h6 class="border-bottom pb-2 mb-3">Estado</h6>
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <span class="fw-bold">Meta Completada</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="boolean-goal">
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                {% endfor %}
+                                <!-- Objetivo numérico -->
+
+                            </div>
+                        </div>
+                        <div class="card-footer border-top-0">
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-sm btn-primary me-2">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+  <!-- Modal para crear meta -->
+  <div class="modal fade" id="crearMetaModal" tabindex="-1" aria-labelledby="crearMetaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="crearMetaModalLabel">Crear Nueva Meta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="nuevaMetaForm">
+                    <!-- Información básica de la meta -->
+                    <div class="mb-4">
+                        <h6 class="border-bottom pb-2 mb-3">Información básica</h6>
+                        
+                        <div class="mb-3">
+                            <label for="nombreMeta" class="form-label">Nombre de la meta *</label>
+                            <input type="text" class="form-control" id="nombreMeta" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descripcionMeta" class="form-label">Descripción*</label>
+                            <textarea class="form-control" id="descripcionMeta" rows="3" placeholder="Describe tu meta y por qué es importante..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="fechaMeta" class="form-label">Fecha límite</label>
+                            <input type="date" class="form-control" id="fechaMeta">
+                        </div>
+                    </div>
+                    
+                    <!-- Objetivos de la meta -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="border-bottom pb-2 mb-0 flex-grow-1">Objetivos</h6>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-info dropdown-toggle" type="button" id="agregarObjetivoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-plus-lg"></i> Agregar objetivo
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="agregarObjetivoDropdown">
+                                    <li><a class="dropdown-item" href="#" id="agregarObjetivoNumerico">Objetivo numérico</a></li>
+                                    <li><a class="dropdown-item" href="#" id="agregarObjetivoNumerico">Objetivo valor</a></li>
+                                    <li><a class="dropdown-item" href="#" id="agregarObjetivoBooleano">Objetivo booleano</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div id="objetivosContainer">
+                            <!-- Los objetivos se agregarán aquí dinámicamente -->
+                            <div class="text-center text-muted py-4" id="noObjetivosMsg">
+                                <i class="bi bi-list-check" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Aún no has añadido objetivos</p>
+                            </div>
+                        </div>
+                    </div>
+            
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="nuevaMetaForm" class="btn btn-primary">Guardar Meta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Templates para objetivos -->
+<template id="objetivoNumericoTemplate">
+    <div class="objective-card position-relative animate-in">
+        <button type="button" class="btn-close btn-close-objective" aria-label="Close"></button>
+        <h6>Objetivo numérico</h6>
+        <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-control" placeholder="Ej: Bajar de peso">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" placeholder="Ej: Reducir mi peso de forma saludable">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Valor inicial</label>
+                <input type="number" class="form-control" placeholder="Ej: 80">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Valor objetivo</label>
+                <input type="number" class="form-control" placeholder="Ej: 70">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Unidad</label>
+            <input type="text" class="form-control" placeholder="Ej: kg, km, libros, etc.">
+        </div>
+    </div>
+</template>
+
+<template id="objetivoBooleanoTemplate">
+    <div class="objective-card position-relative animate-in" style="border-left-color: #198754;">
+        <button type="button" class="btn-close btn-close-objective" aria-label="Close"></button>
+        <h6>Objetivo booleano</h6>
+        <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input type="text" class="form-control" placeholder="Ej: Obtener certificación">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" placeholder="Ej: Completar el curso y obtener el certificado">
+        </div>
+    </div>
+</template>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const objetivosContainer = document.getElementById('objetivosContainer');
+        const noObjetivosMsg = document.getElementById('noObjetivosMsg');
+        const objetivoNumericoTemplate = document.getElementById('objetivoNumericoTemplate');
+        const objetivoBooleanoTemplate = document.getElementById('objetivoBooleanoTemplate');
+        
+        // Agregar objetivo numérico
+        document.getElementById('agregarObjetivoNumerico').addEventListener('click', function(e) {
+            e.preventDefault();
+            agregarObjetivo(objetivoNumericoTemplate);
+        });
+        
+        // Agregar objetivo booleano
+        document.getElementById('agregarObjetivoBooleano').addEventListener('click', function(e) {
+            e.preventDefault();
+            agregarObjetivo(objetivoBooleanoTemplate);
+        });
+        
+        // Función para agregar un objetivo
+        function agregarObjetivo(template) {
+            // Ocultar mensaje de "no hay objetivos"
+            noObjetivosMsg.style.display = 'none';
+            
+            // Clonar el template
+            const clon = template.content.cloneNode(true);
+            
+            // Agregar evento para eliminar el objetivo
+            clon.querySelector('.btn-close-objective').addEventListener('click', function() {
+                this.closest('.objective-card').remove();
+                
+                // Si no hay objetivos, mostrar mensaje
+                if (objetivosContainer.querySelectorAll('.objective-card').length === 0) {
+                    noObjetivosMsg.style.display = 'block';
+                }
+            });
+            
+            // Añadir el clon al contenedor
+            objetivosContainer.appendChild(clon);
+        }
+        
+        // Manejar el envío del formulario
+        document.getElementById('nuevaMetaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Aquí iría la lógica para guardar la meta
+            // Por ahora, solo mostramos un mensaje y cerramos el modal
+            alert('Meta guardada con éxito!');
+            
+            // Cerrar el modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('crearMetaModal'));
+            modal.hide();
+            
+            // Resetear el formulario
+            this.reset();
+            
+            // Limpiar objetivos
+            objetivosContainer.innerHTML = '';
+            noObjetivosMsg.style.display = 'block';
+        });
+    });
+</script>
+
+
+{% endblock %}
+

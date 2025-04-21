@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Nueva Meta</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .floating-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
+        }
+        
+        .objective-card {
+            border-left: 4px solid #0d6efd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-close-objective {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .btn-close-objective:hover {
+            opacity: 1;
+        }
+        
+        .modal-dialog {
+            max-width: 700px;
+        }
+        
+        .animate-in {
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h1>Mis Metas</h1>
+                <p class="text-muted">Organiza tus metas y objetivos personales</p>
+            </div>
+        </div>
+        
+        <!-- Aquí irían las metas existentes -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <!-- Ejemplo de meta existente -->
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Meta de ejemplo</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Aquí va la descripción de una meta de ejemplo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botón flotante para crear meta -->
+    <button class="btn btn-primary floating-btn" data-bs-toggle="modal" data-bs-target="#crearMetaModal">
+        <i class="bi bi-plus-lg"></i>
+    </button>
+    
+    <!-- Modal para crear meta -->
+    <div class="modal fade" id="crearMetaModal" tabindex="-1" aria-labelledby="crearMetaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="crearMetaModalLabel">Crear Nueva Meta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="nuevaMetaForm">
+                        <!-- Información básica de la meta -->
+                        <div class="mb-4">
+                            <h6 class="border-bottom pb-2 mb-3">Información básica</h6>
+                            
+                            <div class="mb-3">
+                                <label for="nombreMeta" class="form-label">Nombre de la meta *</label>
+                                <input type="text" class="form-control" id="nombreMeta" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="descripcionMeta" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcionMeta" rows="3" placeholder="Describe tu meta y por qué es importante..."></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="fechaMeta" class="form-label">Fecha límite</label>
+                                <input type="date" class="form-control" id="fechaMeta">
+                            </div>
+                        </div>
+                        
+                        <!-- Objetivos de la meta -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="border-bottom pb-2 mb-0 flex-grow-1">Objetivos</h6>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="agregarObjetivoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-plus-lg"></i> Agregar objetivo
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="agregarObjetivoDropdown">
+                                        <li><a class="dropdown-item" href="#" id="agregarObjetivoNumerico">Objetivo numérico</a></li>
+                                        <li><a class="dropdown-item" href="#" id="agregarObjetivoBooleano">Objetivo booleano</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div id="objetivosContainer">
+                                <!-- Los objetivos se agregarán aquí dinámicamente -->
+                                <div class="text-center text-muted py-4" id="noObjetivosMsg">
+                                    <i class="bi bi-list-check" style="font-size: 2rem;"></i>
+                                    <p class="mt-2">Aún no has añadido objetivos</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Opciones adicionales -->
+                        <div class="mb-3">
+                            <h6 class="border-bottom pb-2 mb-3">Opciones adicionales</h6>
+                            
+                            <div class="mb-3">
+                                <label for="colorMeta" class="form-label">Color</label>
+                                <select class="form-select" id="colorMeta">
+                                    <option value="primary" selected>Azul</option>
+                                    <option value="success">Verde</option>
+                                    <option value="info">Celeste</option>
+                                    <option value="warning">Amarillo</option>
+                                    <option value="danger">Rojo</option>
+                                    <option value="dark">Negro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="etiquetasMeta" class="form-label">Etiquetas</label>
+                                <input type="text" class="form-control" id="etiquetasMeta" placeholder="Separa las etiquetas con comas">
+                                <div class="form-text">Ej: personal, trabajo, salud</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="nuevaMetaForm" class="btn btn-primary">Guardar Meta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Templates para objetivos -->
+    <template id="objetivoNumericoTemplate">
+        <div class="objective-card position-relative animate-in">
+            <button type="button" class="btn-close btn-close-objective" aria-label="Close"></button>
+            <h6>Objetivo numérico</h6>
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" class="form-control" placeholder="Ej: Bajar de peso">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <input type="text" class="form-control" placeholder="Ej: Reducir mi peso de forma saludable">
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Valor inicial</label>
+                    <input type="number" class="form-control" placeholder="Ej: 80">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Valor objetivo</label>
+                    <input type="number" class="form-control" placeholder="Ej: 70">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Unidad</label>
+                <input type="text" class="form-control" placeholder="Ej: kg, km, libros, etc.">
+            </div>
+        </div>
+    </template>
+    
+    <template id="objetivoBooleanoTemplate">
+        <div class="objective-card position-relative animate-in" style="border-left-color: #198754;">
+            <button type="button" class="btn-close btn-close-objective" aria-label="Close"></button>
+            <h6>Objetivo booleano</h6>
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input type="text" class="form-control" placeholder="Ej: Obtener certificación">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <input type="text" class="form-control" placeholder="Ej: Completar el curso y obtener el certificado">
+            </div>
+        </div>
+    </template>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const objetivosContainer = document.getElementById('objetivosContainer');
+            const noObjetivosMsg = document.getElementById('noObjetivosMsg');
+            const objetivoNumericoTemplate = document.getElementById('objetivoNumericoTemplate');
+            const objetivoBooleanoTemplate = document.getElementById('objetivoBooleanoTemplate');
+            
+            // Agregar objetivo numérico
+            document.getElementById('agregarObjetivoNumerico').addEventListener('click', function(e) {
+                e.preventDefault();
+                agregarObjetivo(objetivoNumericoTemplate);
+            });
+            
+            // Agregar objetivo booleano
+            document.getElementById('agregarObjetivoBooleano').addEventListener('click', function(e) {
+                e.preventDefault();
+                agregarObjetivo(objetivoBooleanoTemplate);
+            });
+            
+            // Función para agregar un objetivo
+            function agregarObjetivo(template) {
+                // Ocultar mensaje de "no hay objetivos"
+                noObjetivosMsg.style.display = 'none';
+                
+                // Clonar el template
+                const clon = template.content.cloneNode(true);
+                
+                // Agregar evento para eliminar el objetivo
+                clon.querySelector('.btn-close-objective').addEventListener('click', function() {
+                    this.closest('.objective-card').remove();
+                    
+                    // Si no hay objetivos, mostrar mensaje
+                    if (objetivosContainer.querySelectorAll('.objective-card').length === 0) {
+                        noObjetivosMsg.style.display = 'block';
+                    }
+                });
+                
+                // Añadir el clon al contenedor
+                objetivosContainer.appendChild(clon);
+            }
+            
+            // Manejar el envío del formulario
+            document.getElementById('nuevaMetaForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Aquí iría la lógica para guardar la meta
+                // Por ahora, solo mostramos un mensaje y cerramos el modal
+                alert('Meta guardada con éxito!');
+                
+                // Cerrar el modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('crearMetaModal'));
+                modal.hide();
+                
+                // Resetear el formulario
+                this.reset();
+                
+                // Limpiar objetivos
+                objetivosContainer.innerHTML = '';
+                noObjetivosMsg.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>
